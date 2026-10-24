@@ -92,6 +92,8 @@ input.ans.no{border-color:var(--bad);background:var(--bad-soft)}
 .readall{border:0;background:none;color:var(--accent);font:inherit;font-size:.85rem;font-weight:600;display:inline-flex;gap:4px;align-items:center;padding:0}
 .readall svg{width:13px;height:13px;fill:currentColor}
 @media (max-width:480px){.slot{grid-template-columns:78px 1fr auto}.verbhead .inf{font-size:1.8rem}}
+/* Phones and tablets already have a keyboard: hide the on-screen one there */
+@media (pointer:coarse){.kb{display:none!important}.wrap{padding-block-end:40px}}
 @media (prefers-reduced-motion:no-preference){input.ans{transition:background .15s,border-color .15s}}
 </style>
 </head>
