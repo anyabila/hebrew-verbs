@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
 <style>
-/* Layout: one centered working column — controls bar, then the practice sheet; keyboard docks below */
+/* Layout: one centered working column — progress, settings, practice sheet, full list; keyboard docks below on desktop */
 :root{
   --bg:#f3f5f8; --surface:#ffffff; --ink:#18212f; --muted:#5c6779; --line:#d9dee7;
   --accent:#2f5bd3; --accent-soft:#e6ecfb; --good:#1d8a55; --good-soft:#e2f4ea; --bad:#c23b3b; --bad-soft:#fbe7e7; --warn:#a86b00;
@@ -31,30 +31,42 @@ header p{margin:4px 0 0;color:var(--muted)}
 .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .group{display:flex;flex-direction:column;gap:6px}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
 button{font:inherit;cursor:pointer}
-.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;display:inline-flex;gap:6px;align-items:baseline}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;display:inline-flex;gap:6px;align-items:center}
 .chip .he{font-family:var(--f-heb);font-size:1.05rem}
 .chip small{color:var(--muted)}
 .chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;width:max-content;max-width:100%}
 .seg button{border:0;background:transparent;color:var(--ink);padding:6px 12px}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed=true]{background:var(--accent);color:var(--surface)}
 .btn{border:1px solid var(--accent);background:var(--accent);color:var(--surface);border-radius:8px;padding:8px 16px;font-weight:600}
 .btn.ghost{background:transparent;color:var(--accent)}
-.btn:focus-visible,.chip:focus-visible,.seg button:focus-visible,input:focus-visible,.key:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.danger{background:var(--bad);border-color:var(--bad)}
+.btn:focus-visible,.chip:focus-visible,.seg button:focus-visible,input:focus-visible,.key:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .linkish{background:none;border:0;color:var(--accent);padding:0;text-decoration:underline;text-underline-offset:3px}
+/* Progress */
+.prog-top{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.bignum{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.bignum small{font-size:1rem;color:var(--muted);font-weight:600}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;width:56px;flex:none}
+.bar i{display:block;height:100%;background:var(--good)}
+.bar.wide{width:100%;height:8px}
+.pct{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.flash{background:var(--good-soft);color:var(--ink);border:1px solid var(--good);border-radius:8px;padding:8px 12px}
+.flash .he{font-family:var(--f-heb);font-size:1.1rem}
 /* Verb heading */
 .verbhead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
 .verbhead .inf{font-family:var(--f-heb);font-size:2.2rem;font-weight:700;line-height:1.1}
 .verbhead .meta{color:var(--muted)}
 .tag{font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--muted)}
+.tag.new{border-color:var(--accent);color:var(--accent);font-weight:700}
 /* Table form */
 .tenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
 .tense{border-top:3px solid var(--accent);padding-top:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .tense h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;align-items:baseline}
-.tense h3 span{font-family:var(--f-heb);color:var(--muted);font-weight:500}
+.tense h3 > span:last-child{font-family:var(--f-heb);color:var(--muted);font-weight:500}
 .slot{display:grid;grid-template-columns:92px 1fr auto;gap:8px;align-items:start}
 .pron{display:flex;flex-direction:column;line-height:1.15;padding-top:6px}
 .pron .he{font-family:var(--f-heb);font-size:1.1rem}
@@ -78,19 +90,30 @@ input.ans.no{border-color:var(--bad);background:var(--bad-soft)}
 .ok-t{color:var(--good);font-weight:700}.no-t{color:var(--bad);font-weight:700}
 .stats{display:flex;gap:20px;color:var(--muted);font-variant-numeric:tabular-nums}
 .stats b{color:var(--ink)}
-/* Keyboard */
-.kb{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:5px;align-items:center;z-index:5}
-.kb .krow{display:flex;gap:4px;direction:rtl;justify-content:center;width:100%;max-width:640px}
-.key{flex:1 1 0;min-width:0;max-width:52px;height:42px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font-family:var(--f-heb);font-size:1.25rem;padding:0}
-.key.wide{max-width:140px;flex:3 1 0;font-family:var(--f-body);font-size:.9rem}
-.key:active{background:var(--accent-soft)}
-.hint{font-size:.85rem;color:var(--muted)}
+/* Full list */
+details.panel summary{cursor:pointer;font-weight:700;list-style-position:outside}
+.vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 16px;margin:0;padding:0;list-style:none}
+.vlist li{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line);min-width:0}
+.vlist .n{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.85rem;text-align:right}
+.vlist button{background:none;border:0;padding:0;color:var(--ink);text-align:left;display:flex;gap:8px;align-items:baseline;min-width:0}
+.vlist .he{font-family:var(--f-heb);font-size:1.1rem}
+.vlist small{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st{font-size:.75rem;font-weight:700;white-space:nowrap}
+.st.done{color:var(--good)}.st.now{color:var(--accent)}.st.wait{color:var(--muted);font-weight:400}
+/* Read aloud */
 .spk{border:1px solid var(--line);background:transparent;color:var(--accent);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
 .spk svg{width:16px;height:16px;fill:currentColor}
 .spk:hover,.spk.playing{background:var(--accent-soft);border-color:var(--accent)}
 .spk:focus-visible,.readall:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .readall{border:0;background:none;color:var(--accent);font:inherit;font-size:.85rem;font-weight:600;display:inline-flex;gap:4px;align-items:center;padding:0}
 .readall svg{width:13px;height:13px;fill:currentColor}
+/* Keyboard */
+.kb{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:5px;align-items:center;z-index:5}
+.kb .krow{display:flex;gap:4px;direction:rtl;justify-content:center;width:100%;max-width:640px}
+.key{flex:1 1 0;min-width:0;max-width:52px;height:42px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font-family:var(--f-heb);font-size:1.25rem;padding:0}
+.key.wide{max-width:140px;flex:3 1 0;font-family:var(--f-body);font-size:.9rem}
+.key:active{background:var(--accent-soft)}
+.hint{font-size:.85rem;color:var(--muted);margin:0}
 @media (max-width:480px){.slot{grid-template-columns:78px 1fr auto}.verbhead .inf{font-size:1.8rem}}
 /* Phones and tablets already have a keyboard: hide the on-screen one there */
 @media (pointer:coarse){.kb{display:none!important}.wrap{padding-block-end:40px}}
@@ -102,123 +125,292 @@ input.ans.no{border-color:var(--bad);background:var(--bad-soft)}
 <div class="wrap">
   <header>
     <h1>Hebrew Verb Drills <span lang="he" dir="rtl">תרגול פעלים</span></h1>
-    <p>Fill in past, present and future for every person, number and gender. Pick verbs and tenses, then work the full table or a quick random drill.</p>
+    <p>Learn the 50 most common Hebrew verbs, starting with the most frequent. You practice a few at a time, and a new verb joins as soon as you've learned one.</p>
   </header>
 
+  <section class="panel" id="progress" aria-label="Your progress"></section>
+
   <section class="panel" aria-label="Settings">
-    <div class="group">
-      <div class="row" style="justify-content:space-between"><span class="label">Verbs</span>
-        <span class="row"><button class="linkish" id="allVerbs" type="button">Select all</button><button class="linkish" id="noVerbs" type="button">Clear</button></span></div>
-      <div class="row" id="verbChips"></div>
-    </div>
     <div class="controls">
+      <div class="group"><span class="label">Mode</span>
+        <div class="seg" id="modeSeg"><button type="button" data-v="drill" aria-pressed="true">Quick drill</button><button type="button" data-v="table" aria-pressed="false">Full table</button></div></div>
       <div class="group"><span class="label">Tenses</span>
         <div class="row" id="tenseChips"></div></div>
       <div class="group"><span class="label">Answer in</span>
         <div class="seg" id="scriptSeg"><button type="button" data-v="he" aria-pressed="true">עברית</button><button type="button" data-v="tr" aria-pressed="false">Transliteration</button></div></div>
-      <div class="group"><span class="label">Mode</span>
-        <div class="seg" id="modeSeg"><button type="button" data-v="table" aria-pressed="true">Full table</button><button type="button" data-v="drill" aria-pressed="false">Quick drill</button></div></div>
+      <div class="group"><span class="label">Verbs at a time</span>
+        <div class="seg" id="batchSeg"><button type="button" data-v="3">3</button><button type="button" data-v="5">5</button><button type="button" data-v="8">8</button></div></div>
       <div class="group"><span class="label">Read-aloud speed</span>
-        <div class="seg" id="rateSeg"><button type="button" data-v="0.9" aria-pressed="true">Normal</button><button type="button" data-v="0.6" aria-pressed="false">Slow</button></div></div>
+        <div class="seg" id="rateSeg"><button type="button" data-v="0.9">Normal</button><button type="button" data-v="0.6">Slow</button></div></div>
     </div>
   </section>
 
-  <section class="panel" id="tableView" aria-label="Conjugation table"></section>
-  <section class="panel drill" id="drillView" aria-label="Quick drill" hidden></section>
+  <section class="panel drill" id="drillView" aria-label="Quick drill"></section>
+  <section class="panel" id="tableView" aria-label="Conjugation table" hidden></section>
+
+  <details class="panel" id="allList">
+    <summary>All 50 verbs, most common first</summary>
+    <p class="hint">The order is an approximate everyday-frequency ranking. Click any verb to open its full table.</p>
+    <ul class="vlist" id="vlist"></ul>
+    <div class="row" id="resetRow"><button class="btn ghost" id="resetBtn" type="button">Reset my progress</button></div>
+  </details>
 </div>
 
 <div class="kb" id="kb" aria-label="Hebrew keyboard"></div>
 
 <script>
-// Each verb: present [m.s, f.s, m.pl, f.pl]; past & future [I, you m.s, you f.s, he, she, we, you m.pl, you f.pl, they]
-const V = [
- {inf:"לכתוב",tr:"likhtov",en:"to write",root:"כ־ת־ב",b:"Pa'al",
-  pres:[["כותב","kotev"],["כותבת","kotevet"],["כותבים","kotvim"],["כותבות","kotvot"]],
-  past:[["כתבתי","katavti"],["כתבת","katavta"],["כתבת","katavt"],["כתב","katav"],["כתבה","katva"],["כתבנו","katavnu"],["כתבתם","ktavtem"],["כתבתן","ktavten"],["כתבו","katvu"]],
-  fut:[["אכתוב","ekhtov"],["תכתוב","tikhtov"],["תכתבי","tikhtevi"],["יכתוב","yikhtov"],["תכתוב","tikhtov"],["נכתוב","nikhtov"],["תכתבו","tikhtevu"],["תכתבו","tikhtevu"],["יכתבו","yikhtevu"]]},
- {inf:"ללמוד",tr:"lilmod",en:"to learn",root:"ל־מ־ד",b:"Pa'al",
-  pres:[["לומד","lomed"],["לומדת","lomedet"],["לומדים","lomdim"],["לומדות","lomdot"]],
-  past:[["למדתי","lamadeti"],["למדת","lamadeta"],["למדת","lamadet"],["למד","lamad"],["למדה","lamda"],["למדנו","lamadnu"],["למדתם","lemadetem"],["למדתן","lemadeten"],["למדו","lamdu"]],
-  fut:[["אלמד","elmad"],["תלמד","tilmad"],["תלמדי","tilmedi"],["ילמד","yilmad"],["תלמד","tilmad"],["נלמד","nilmad"],["תלמדו","tilmedu"],["תלמדו","tilmedu"],["ילמדו","yilmedu"]]},
- {inf:"לשמור",tr:"lishmor",en:"to keep, guard",root:"ש־מ־ר",b:"Pa'al",
-  pres:[["שומר","shomer"],["שומרת","shomeret"],["שומרים","shomrim"],["שומרות","shomrot"]],
-  past:[["שמרתי","shamarti"],["שמרת","shamarta"],["שמרת","shamart"],["שמר","shamar"],["שמרה","shamra"],["שמרנו","shamarnu"],["שמרתם","shmartem"],["שמרתן","shmarten"],["שמרו","shamru"]],
-  fut:[["אשמור","eshmor"],["תשמור","tishmor"],["תשמרי","tishmeri"],["ישמור","yishmor"],["תשמור","tishmor"],["נשמור","nishmor"],["תשמרו","tishmeru"],["תשמרו","tishmeru"],["ישמרו","yishmeru"]]},
- {inf:"ללכת",tr:"lalekhet",en:"to go, walk",root:"ה־ל־ך",b:"Pa'al",
-  pres:[["הולך","holekh"],["הולכת","holekhet"],["הולכים","holkhim"],["הולכות","holkhot"]],
-  past:[["הלכתי","halakhti"],["הלכת","halakhta"],["הלכת","halakht"],["הלך","halakh"],["הלכה","halkha"],["הלכנו","halakhnu"],["הלכתם","halakhtem"],["הלכתן","halakhten"],["הלכו","halkhu"]],
-  fut:[["אלך","elekh"],["תלך","telekh"],["תלכי","telkhi"],["ילך","yelekh"],["תלך","telekh"],["נלך","nelekh"],["תלכו","telkhu"],["תלכו","telkhu"],["ילכו","yelkhu"]]},
- {inf:"לאכול",tr:"le'ekhol",en:"to eat",root:"א־כ־ל",b:"Pa'al",
-  pres:[["אוכל","okhel"],["אוכלת","okhelet"],["אוכלים","okhlim"],["אוכלות","okhlot"]],
-  past:[["אכלתי","akhalti"],["אכלת","akhalta"],["אכלת","akhalt"],["אכל","akhal"],["אכלה","akhla"],["אכלנו","akhalnu"],["אכלתם","akhaltem"],["אכלתן","akhalten"],["אכלו","akhlu"]],
-  fut:[["אוכל","okhal"],["תאכל","tokhal"],["תאכלי","tokhli"],["יאכל","yokhal"],["תאכל","tokhal"],["נאכל","nokhal"],["תאכלו","tokhlu"],["תאכלו","tokhlu"],["יאכלו","yokhlu"]]},
- {inf:"לאהוב",tr:"le'ehov",en:"to love",root:"א־ה־ב",b:"Pa'al",
-  pres:[["אוהב","ohev"],["אוהבת","ohevet"],["אוהבים","ohavim"],["אוהבות","ohavot"]],
-  past:[["אהבתי","ahavti"],["אהבת","ahavta"],["אהבת","ahavt"],["אהב","ahav"],["אהבה","ahava"],["אהבנו","ahavnu"],["אהבתם","ahavtem"],["אהבתן","ahavten"],["אהבו","ahavu"]],
-  fut:[["אוהב","ohav"],["תאהב","tohav"],["תאהבי","tohavi"],["יאהב","yohav"],["תאהב","tohav"],["נאהב","nohav"],["תאהבו","tohavu"],["תאהבו","tohavu"],["יאהבו","yohavu"]]},
- {inf:"לגור",tr:"lagur",en:"to live (reside)",root:"ג־ו־ר",b:"Pa'al",
-  pres:[["גר","gar"],["גרה","gara"],["גרים","garim"],["גרות","garot"]],
-  past:[["גרתי","garti"],["גרת","garta"],["גרת","gart"],["גר","gar"],["גרה","gara"],["גרנו","garnu"],["גרתם","gartem"],["גרתן","garten"],["גרו","garu"]],
-  fut:[["אגור","agur"],["תגור","tagur"],["תגורי","taguri"],["יגור","yagur"],["תגור","tagur"],["נגור","nagur"],["תגורו","taguru"],["תגורו","taguru"],["יגורו","yaguru"]]},
- {inf:"לרוץ",tr:"larutz",en:"to run",root:"ר־ו־ץ",b:"Pa'al",
-  pres:[["רץ","rats"],["רצה","ratsa"],["רצים","ratsim"],["רצות","ratsot"]],
-  past:[["רצתי","ratsti"],["רצת","ratsta"],["רצת","ratst"],["רץ","rats"],["רצה","ratsa"],["רצנו","ratsnu"],["רצתם","ratstem"],["רצתן","ratsten"],["רצו","ratsu"]],
-  fut:[["ארוץ","aruts"],["תרוץ","taruts"],["תרוצי","tarutsi"],["ירוץ","yaruts"],["תרוץ","taruts"],["נרוץ","naruts"],["תרוצו","tarutsu"],["תרוצו","tarutsu"],["ירוצו","yarutsu"]]},
- {inf:"לקנות",tr:"liknot",en:"to buy",root:"ק־נ־ה",b:"Pa'al",
-  pres:[["קונה","kone"],["קונה","kona"],["קונים","konim"],["קונות","konot"]],
-  past:[["קניתי","kaniti"],["קנית","kanita"],["קנית","kanit"],["קנה","kana"],["קנתה","kanta"],["קנינו","kaninu"],["קניתם","knitem"],["קניתן","kniten"],["קנו","kanu"]],
-  fut:[["אקנה","ekne"],["תקנה","tikne"],["תקני","tikni"],["יקנה","yikne"],["תקנה","tikne"],["נקנה","nikne"],["תקנו","tiknu"],["תקנו","tiknu"],["יקנו","yiknu"]]},
- {inf:"לדבר",tr:"ledaber",en:"to speak",root:"ד־ב־ר",b:"Pi'el",
-  pres:[["מדבר","medaber"],["מדברת","medaberet"],["מדברים","medabrim"],["מדברות","medabrot"]],
-  past:[["דיברתי","dibarti"],["דיברת","dibarta"],["דיברת","dibart"],["דיבר","diber"],["דיברה","dibra"],["דיברנו","dibarnu"],["דיברתם","dibartem"],["דיברתן","dibarten"],["דיברו","dibru"]],
-  fut:[["אדבר","adaber"],["תדבר","tedaber"],["תדברי","tedabri"],["ידבר","yedaber"],["תדבר","tedaber"],["נדבר","nedaber"],["תדברו","tedabru"],["תדברו","tedabru"],["ידברו","yedabru"]]},
- {inf:"להזמין",tr:"lehazmin",en:"to invite, order",root:"ז־מ־נ",b:"Hif'il",
-  pres:[["מזמין","mazmin"],["מזמינה","mazmina"],["מזמינים","mazminim"],["מזמינות","mazminot"]],
-  past:[["הזמנתי","hizmanti"],["הזמנת","hizmanta"],["הזמנת","hizmant"],["הזמין","hizmin"],["הזמינה","hizmina"],["הזמנו","hizmanu"],["הזמנתם","hizmantem"],["הזמנתן","hizmanten"],["הזמינו","hizminu"]],
-  fut:[["אזמין","azmin"],["תזמין","tazmin"],["תזמיני","tazmini"],["יזמין","yazmin"],["תזמין","tazmin"],["נזמין","nazmin"],["תזמינו","tazminu"],["תזמינו","tazminu"],["יזמינו","yazminu"]]},
- {inf:"להתלבש",tr:"lehitlabesh",en:"to get dressed",root:"ל־ב־ש",b:"Hitpa'el",
-  pres:[["מתלבש","mitlabesh"],["מתלבשת","mitlabeshet"],["מתלבשים","mitlabshim"],["מתלבשות","mitlabshot"]],
-  past:[["התלבשתי","hitlabashti"],["התלבשת","hitlabashta"],["התלבשת","hitlabasht"],["התלבש","hitlabesh"],["התלבשה","hitlabsha"],["התלבשנו","hitlabashnu"],["התלבשתם","hitlabashtem"],["התלבשתן","hitlabashten"],["התלבשו","hitlabshu"]],
-  fut:[["אתלבש","etlabesh"],["תתלבש","titlabesh"],["תתלבשי","titlabshi"],["יתלבש","yitlabesh"],["תתלבש","titlabesh"],["נתלבש","nitlabesh"],["תתלבשו","titlabshu"],["תתלבשו","titlabshu"],["יתלבשו","yitlabshu"]]},
+// Verbs in approximate frequency order. Each form is "Hebrew translit".
+// present: m.sg, f.sg, m.pl, f.pl · past & future: I, you m.sg, you f.sg, he, she, we, you m.pl, you f.pl, they
+const RAW = [
+["להיות","lihyot","to be","ה־י־ה","Pa'al",null,
+ "הייתי hayiti,היית hayita,היית hayit,היה haya,הייתה hayta,היינו hayinu,הייתם hayitem,הייתן hayiten,היו hayu",
+ "אהיה ehye,תהיה tihye,תהיי tihyi,יהיה yihye,תהיה tihye,נהיה nihye,תהיו tihyu,תהיו tihyu,יהיו yihyu"],
+["לעשות","la'asot","to do, make","ע־ש־ה","Pa'al",
+ "עושה ose,עושה osa,עושים osim,עושות osot",
+ "עשיתי asiti,עשית asita,עשית asit,עשה asa,עשתה asta,עשינו asinu,עשיתם asitem,עשיתן asiten,עשו asu",
+ "אעשה e'ese,תעשה ta'ase,תעשי ta'asi,יעשה ya'ase,תעשה ta'ase,נעשה na'ase,תעשו ta'asu,תעשו ta'asu,יעשו ya'asu"],
+["לרצות","lirtsot","to want","ר־צ־ה","Pa'al",
+ "רוצה rotse,רוצה rotsa,רוצים rotsim,רוצות rotsot",
+ "רציתי ratsiti,רצית ratsita,רצית ratsit,רצה ratsa,רצתה ratsta,רצינו ratsinu,רציתם retsitem,רציתן retsiten,רצו ratsu",
+ "ארצה ertse,תרצה tirtse,תרצי tirtsi,ירצה yirtse,תרצה tirtse,נרצה nirtse,תרצו tirtsu,תרצו tirtsu,ירצו yirtsu"],
+["לדעת","lada'at","to know","י־ד־ע","Pa'al",
+ "יודע yode'a,יודעת yoda'at,יודעים yod'im,יודעות yod'ot",
+ "ידעתי yada'ti,ידעת yada'ta,ידעת yada'at,ידע yada,ידעה yad'a,ידענו yada'nu,ידעתם yeda'tem,ידעתן yeda'ten,ידעו yad'u",
+ "אדע eda,תדע teda,תדעי ted'i,ידע yeda,תדע teda,נדע neda,תדעו ted'u,תדעו ted'u,ידעו yed'u"],
+["לבוא","lavo","to come","ב־ו־א","Pa'al",
+ "בא ba,באה ba'a,באים ba'im,באות ba'ot",
+ "באתי bati,באת bata,באת bat,בא ba,באה ba'a,באנו banu,באתם batem,באתן baten,באו ba'u",
+ "אבוא avo,תבוא tavo,תבואי tavo'i,יבוא yavo,תבוא tavo,נבוא navo,תבואו tavo'u,תבואו tavo'u,יבואו yavo'u"],
+["ללכת","lalekhet","to go, walk","ה־ל־ך","Pa'al",
+ "הולך holekh,הולכת holekhet,הולכים holkhim,הולכות holkhot",
+ "הלכתי halakhti,הלכת halakhta,הלכת halakht,הלך halakh,הלכה halkha,הלכנו halakhnu,הלכתם halakhtem,הלכתן halakhten,הלכו halkhu",
+ "אלך elekh,תלך telekh,תלכי telkhi,ילך yelekh,תלך telekh,נלך nelekh,תלכו telkhu,תלכו telkhu,ילכו yelkhu"],
+["לראות","lir'ot","to see","ר־א־ה","Pa'al",
+ "רואה ro'e,רואה ro'a,רואים ro'im,רואות ro'ot",
+ "ראיתי ra'iti,ראית ra'ita,ראית ra'it,ראה ra'a,ראתה ra'ata,ראינו ra'inu,ראיתם re'item,ראיתן re'iten,ראו ra'u",
+ "אראה er'e,תראה tir'e,תראי tir'i,יראה yir'e,תראה tir'e,נראה nir'e,תראו tir'u,תראו tir'u,יראו yir'u"],
+["לתת","latet","to give","נ־ת־ן","Pa'al",
+ "נותן noten,נותנת notenet,נותנים notnim,נותנות notnot",
+ "נתתי natati,נתת natata,נתת natat,נתן natan,נתנה natna,נתנו natanu,נתתם netatem,נתתן netaten,נתנו natnu",
+ "אתן eten,תיתן titen,תיתני titni,ייתן yiten,תיתן titen,ניתן niten,תיתנו titnu,תיתנו titnu,ייתנו yitnu"],
+["לומר","lomar","to say","א־מ־ר","Pa'al",
+ "אומר omer,אומרת omeret,אומרים omrim,אומרות omrot",
+ "אמרתי amarti,אמרת amarta,אמרת amart,אמר amar,אמרה amra,אמרנו amarnu,אמרתם amartem,אמרתן amarten,אמרו amru",
+ "אומר omar,תאמר tomar,תאמרי tomri,יאמר yomar,תאמר tomar,נאמר nomar,תאמרו tomru,תאמרו tomru,יאמרו yomru"],
+["לחשוב","lakhshov","to think","ח־ש־ב","Pa'al",
+ "חושב khoshev,חושבת khoshevet,חושבים khoshvim,חושבות khoshvot",
+ "חשבתי khashavti,חשבת khashavta,חשבת khashavt,חשב khashav,חשבה khashva,חשבנו khashavnu,חשבתם khashavtem,חשבתן khashavten,חשבו khashvu",
+ "אחשוב akhshov,תחשוב takhshov,תחשבי takhshevi,יחשוב yakhshov,תחשוב takhshov,נחשוב nakhshov,תחשבו takhshevu,תחשבו takhshevu,יחשבו yakhshevu"],
+["לקחת","lakakhat","to take","ל־ק־ח","Pa'al",
+ "לוקח loke'akh,לוקחת lokakhat,לוקחים lokkhim,לוקחות lokkhot",
+ "לקחתי lakakhti,לקחת lakakhta,לקחת lakakht,לקח lakakh,לקחה lakkha,לקחנו lakakhnu,לקחתם lekakhtem,לקחתן lekakhten,לקחו lakkhu",
+ "אקח ekakh,תיקח tikakh,תיקחי tikkhi,ייקח yikakh,תיקח tikakh,ניקח nikakh,תיקחו tikkhu,תיקחו tikkhu,ייקחו yikkhu"],
+["לאכול","le'ekhol","to eat","א־כ־ל","Pa'al",
+ "אוכל okhel,אוכלת okhelet,אוכלים okhlim,אוכלות okhlot",
+ "אכלתי akhalti,אכלת akhalta,אכלת akhalt,אכל akhal,אכלה akhla,אכלנו akhalnu,אכלתם akhaltem,אכלתן akhalten,אכלו akhlu",
+ "אוכל okhal,תאכל tokhal,תאכלי tokhli,יאכל yokhal,תאכל tokhal,נאכל nokhal,תאכלו tokhlu,תאכלו tokhlu,יאכלו yokhlu"],
+["לדבר","ledaber","to speak","ד־ב־ר","Pi'el",
+ "מדבר medaber,מדברת medaberet,מדברים medabrim,מדברות medabrot",
+ "דיברתי dibarti,דיברת dibarta,דיברת dibart,דיבר diber,דיברה dibra,דיברנו dibarnu,דיברתם dibartem,דיברתן dibarten,דיברו dibru",
+ "אדבר adaber,תדבר tedaber,תדברי tedabri,ידבר yedaber,תדבר tedaber,נדבר nedaber,תדברו tedabru,תדברו tedabru,ידברו yedabru"],
+["לשמוע","lishmo'a","to hear","ש־מ־ע","Pa'al",
+ "שומע shome'a,שומעת shoma'at,שומעים shom'im,שומעות shom'ot",
+ "שמעתי shama'ti,שמעת shama'ta,שמעת shama'at,שמע shama,שמעה sham'a,שמענו shama'nu,שמעתם shma'tem,שמעתן shma'ten,שמעו sham'u",
+ "אשמע eshma,תשמע tishma,תשמעי tishme'i,ישמע yishma,תשמע tishma,נשמע nishma,תשמעו tishme'u,תשמעו tishme'u,ישמעו yishme'u"],
+["לכתוב","likhtov","to write","כ־ת־ב","Pa'al",
+ "כותב kotev,כותבת kotevet,כותבים kotvim,כותבות kotvot",
+ "כתבתי katavti,כתבת katavta,כתבת katavt,כתב katav,כתבה katva,כתבנו katavnu,כתבתם ktavtem,כתבתן ktavten,כתבו katvu",
+ "אכתוב ekhtov,תכתוב tikhtov,תכתבי tikhtevi,יכתוב yikhtov,תכתוב tikhtov,נכתוב nikhtov,תכתבו tikhtevu,תכתבו tikhtevu,יכתבו yikhtevu"],
+["לקרוא","likro","to read, call","ק־ר־א","Pa'al",
+ "קורא kore,קוראת koret,קוראים kor'im,קוראות kor'ot",
+ "קראתי karati,קראת karata,קראת karat,קרא kara,קראה kar'a,קראנו karanu,קראתם keratem,קראתן keraten,קראו kar'u",
+ "אקרא ekra,תקרא tikra,תקראי tikre'i,יקרא yikra,תקרא tikra,נקרא nikra,תקראו tikre'u,תקראו tikre'u,יקראו yikre'u"],
+["לעבוד","la'avod","to work","ע־ב־ד","Pa'al",
+ "עובד oved,עובדת ovedet,עובדים ovdim,עובדות ovdot",
+ "עבדתי avadeti,עבדת avadeta,עבדת avadet,עבד avad,עבדה avda,עבדנו avadnu,עבדתם avadetem,עבדתן avadeten,עבדו avdu",
+ "אעבוד e'evod,תעבוד ta'avod,תעבדי ta'avdi,יעבוד ya'avod,תעבוד ta'avod,נעבוד na'avod,תעבדו ta'avdu,תעבדו ta'avdu,יעבדו ya'avdu"],
+["לגור","lagur","to live (reside)","ג־ו־ר","Pa'al",
+ "גר gar,גרה gara,גרים garim,גרות garot",
+ "גרתי garti,גרת garta,גרת gart,גר gar,גרה gara,גרנו garnu,גרתם gartem,גרתן garten,גרו garu",
+ "אגור agur,תגור tagur,תגורי taguri,יגור yagur,תגור tagur,נגור nagur,תגורו taguru,תגורו taguru,יגורו yaguru"],
+["לשבת","lashevet","to sit","י־ש־ב","Pa'al",
+ "יושב yoshev,יושבת yoshevet,יושבים yoshvim,יושבות yoshvot",
+ "ישבתי yashavti,ישבת yashavta,ישבת yashavt,ישב yashav,ישבה yashva,ישבנו yashavnu,ישבתם yeshavtem,ישבתן yeshavten,ישבו yashvu",
+ "אשב eshev,תשב teshev,תשבי teshvi,ישב yeshev,תשב teshev,נשב neshev,תשבו teshvu,תשבו teshvu,ישבו yeshvu"],
+["לקום","lakum","to get up","ק־ו־ם","Pa'al",
+ "קם kam,קמה kama,קמים kamim,קמות kamot",
+ "קמתי kamti,קמת kamta,קמת kamt,קם kam,קמה kama,קמנו kamnu,קמתם kamtem,קמתן kamten,קמו kamu",
+ "אקום akum,תקום takum,תקומי takumi,יקום yakum,תקום takum,נקום nakum,תקומו takumu,תקומו takumu,יקומו yakumu"],
+["לאהוב","le'ehov","to love","א־ה־ב","Pa'al",
+ "אוהב ohev,אוהבת ohevet,אוהבים ohavim,אוהבות ohavot",
+ "אהבתי ahavti,אהבת ahavta,אהבת ahavt,אהב ahav,אהבה ahava,אהבנו ahavnu,אהבתם ahavtem,אהבתן ahavten,אהבו ahavu",
+ "אוהב ohav,תאהב tohav,תאהבי tohavi,יאהב yohav,תאהב tohav,נאהב nohav,תאהבו tohavu,תאהבו tohavu,יאהבו yohavu"],
+["לקנות","liknot","to buy","ק־נ־ה","Pa'al",
+ "קונה kone,קונה kona,קונים konim,קונות konot",
+ "קניתי kaniti,קנית kanita,קנית kanit,קנה kana,קנתה kanta,קנינו kaninu,קניתם knitem,קניתן kniten,קנו kanu",
+ "אקנה ekne,תקנה tikne,תקני tikni,יקנה yikne,תקנה tikne,נקנה nikne,תקנו tiknu,תקנו tiknu,יקנו yiknu"],
+["ללמוד","lilmod","to learn","ל־מ־ד","Pa'al",
+ "לומד lomed,לומדת lomedet,לומדים lomdim,לומדות lomdot",
+ "למדתי lamadeti,למדת lamadeta,למדת lamadet,למד lamad,למדה lamda,למדנו lamadnu,למדתם lemadetem,למדתן lemadeten,למדו lamdu",
+ "אלמד elmad,תלמד tilmad,תלמדי tilmedi,ילמד yilmad,תלמד tilmad,נלמד nilmad,תלמדו tilmedu,תלמדו tilmedu,ילמדו yilmedu"],
+["לשתות","lishtot","to drink","ש־ת־ה","Pa'al",
+ "שותה shote,שותה shota,שותים shotim,שותות shotot",
+ "שתיתי shatiti,שתית shatita,שתית shatit,שתה shata,שתתה shateta,שתינו shatinu,שתיתם shtitem,שתיתן shtiten,שתו shatu",
+ "אשתה eshte,תשתה tishte,תשתי tishti,ישתה yishte,תשתה tishte,נשתה nishte,תשתו tishtu,תשתו tishtu,ישתו yishtu"],
+["לישון","lishon","to sleep","י־ש־ן","Pa'al",
+ "ישן yashen,ישנה yeshena,ישנים yeshenim,ישנות yeshenot",
+ "ישנתי yashanti,ישנת yashanta,ישנת yashant,ישן yashan,ישנה yashna,ישנו yashanu,ישנתם yeshantem,ישנתן yeshanten,ישנו yashnu",
+ "אישן ishan,תישן tishan,תישני tishni,יישן yishan,תישן tishan,נישן nishan,תישנו tishnu,תישנו tishnu,יישנו yishnu"],
+["לצאת","latset","to go out","י־צ־א","Pa'al",
+ "יוצא yotse,יוצאת yotset,יוצאים yots'im,יוצאות yots'ot",
+ "יצאתי yatsati,יצאת yatsata,יצאת yatsat,יצא yatsa,יצאה yats'a,יצאנו yatsanu,יצאתם yetsatem,יצאתן yetsaten,יצאו yats'u",
+ "אצא etse,תצא tetse,תצאי tets'i,יצא yetse,תצא tetse,נצא netse,תצאו tets'u,תצאו tets'u,יצאו yets'u"],
+["להגיע","lehagi'a","to arrive","נ־ג־ע","Hif'il",
+ "מגיע magi'a,מגיעה magi'a,מגיעים magi'im,מגיעות magi'ot",
+ "הגעתי higati,הגעת higata,הגעת higat,הגיע higi'a,הגיעה higi'a,הגענו higanu,הגעתם higatem,הגעתן higaten,הגיעו higi'u",
+ "אגיע agi'a,תגיע tagi'a,תגיעי tagi'i,יגיע yagi'a,תגיע tagi'a,נגיע nagi'a,תגיעו tagi'u,תגיעו tagi'u,יגיעו yagi'u"],
+["לחזור","lakhzor","to return","ח־ז־ר","Pa'al",
+ "חוזר khozer,חוזרת khozeret,חוזרים khozrim,חוזרות khozrot",
+ "חזרתי khazarti,חזרת khazarta,חזרת khazart,חזר khazar,חזרה khazra,חזרנו khazarnu,חזרתם khazartem,חזרתן khazarten,חזרו khazru",
+ "אחזור akhzor,תחזור takhzor,תחזרי takhzeri,יחזור yakhzor,תחזור takhzor,נחזור nakhzor,תחזרו takhzeru,תחזרו takhzeru,יחזרו yakhzeru"],
+["לעזור","la'azor","to help","ע־ז־ר","Pa'al",
+ "עוזר ozer,עוזרת ozeret,עוזרים ozrim,עוזרות ozrot",
+ "עזרתי azarti,עזרת azarta,עזרת azart,עזר azar,עזרה azra,עזרנו azarnu,עזרתם azartem,עזרתן azarten,עזרו azru",
+ "אעזור e'ezor,תעזור ta'azor,תעזרי ta'azri,יעזור ya'azor,תעזור ta'azor,נעזור na'azor,תעזרו ta'azru,תעזרו ta'azru,יעזרו ya'azru"],
+["לשאול","lish'ol","to ask (a question)","ש־א־ל","Pa'al",
+ "שואל sho'el,שואלת sho'elet,שואלים sho'alim,שואלות sho'alot",
+ "שאלתי sha'alti,שאלת sha'alta,שאלת sha'alt,שאל sha'al,שאלה sha'ala,שאלנו sha'alnu,שאלתם she'altem,שאלתן she'alten,שאלו sha'alu",
+ "אשאל esh'al,תשאל tish'al,תשאלי tish'ali,ישאל yish'al,תשאל tish'al,נשאל nish'al,תשאלו tish'alu,תשאלו tish'alu,ישאלו yish'alu"],
+["לפתוח","liftoakh","to open","פ־ת־ח","Pa'al",
+ "פותח pote'akh,פותחת potakhat,פותחים potkhim,פותחות potkhot",
+ "פתחתי patakhti,פתחת patakhta,פתחת patakht,פתח patakh,פתחה patkha,פתחנו patakhnu,פתחתם ptakhtem,פתחתן ptakhten,פתחו patkhu",
+ "אפתח eftakh,תפתח tiftakh,תפתחי tiftekhi,יפתח yiftakh,תפתח tiftakh,נפתח niftakh,תפתחו tiftekhu,תפתחו tiftekhu,יפתחו yiftekhu"],
+["לסגור","lisgor","to close","ס־ג־ר","Pa'al",
+ "סוגר soger,סוגרת sogeret,סוגרים sogrim,סוגרות sogrot",
+ "סגרתי sagarti,סגרת sagarta,סגרת sagart,סגר sagar,סגרה sagra,סגרנו sagarnu,סגרתם sgartem,סגרתן sgarten,סגרו sagru",
+ "אסגור esgor,תסגור tisgor,תסגרי tisgeri,יסגור yisgor,תסגור tisgor,נסגור nisgor,תסגרו tisgeru,תסגרו tisgeru,יסגרו yisgeru"],
+["לשים","lasim","to put","ש־י־ם","Pa'al",
+ "שם sam,שמה sama,שמים samim,שמות samot",
+ "שמתי samti,שמת samta,שמת samt,שם sam,שמה sama,שמנו samnu,שמתם samtem,שמתן samten,שמו samu",
+ "אשים asim,תשים tasim,תשימי tasimi,ישים yasim,תשים tasim,נשים nasim,תשימו tasimu,תשימו tasimu,ישימו yasimu"],
+["למצוא","limtso","to find","מ־צ־א","Pa'al",
+ "מוצא motse,מוצאת motset,מוצאים mots'im,מוצאות mots'ot",
+ "מצאתי matsati,מצאת matsata,מצאת matsat,מצא matsa,מצאה mats'a,מצאנו matsanu,מצאתם metsatem,מצאתן metsaten,מצאו mats'u",
+ "אמצא emtsa,תמצא timtsa,תמצאי timtse'i,ימצא yimtsa,תמצא timtsa,נמצא nimtsa,תמצאו timtse'u,תמצאו timtse'u,ימצאו yimtse'u"],
+["להבין","lehavin","to understand","ב־י־ן","Hif'il",
+ "מבין mevin,מבינה mevina,מבינים mevinim,מבינות mevinot",
+ "הבנתי hevanti,הבנת hevanta,הבנת hevant,הבין hevin,הבינה hevina,הבנו hevanu,הבנתם hevantem,הבנתן hevanten,הבינו hevinu",
+ "אבין avin,תבין tavin,תביני tavini,יבין yavin,תבין tavin,נבין navin,תבינו tavinu,תבינו tavinu,יבינו yavinu"],
+["להתחיל","lehatkhil","to start","ת־ח־ל","Hif'il",
+ "מתחיל matkhil,מתחילה matkhila,מתחילים matkhilim,מתחילות matkhilot",
+ "התחלתי hitkhalti,התחלת hitkhalta,התחלת hitkhalt,התחיל hitkhil,התחילה hitkhila,התחלנו hitkhalnu,התחלתם hitkhaltem,התחלתן hitkhalten,התחילו hitkhilu",
+ "אתחיל atkhil,תתחיל tatkhil,תתחילי tatkhili,יתחיל yatkhil,תתחיל tatkhil,נתחיל natkhil,תתחילו tatkhilu,תתחילו tatkhilu,יתחילו yatkhilu"],
+["לסיים","lesayem","to finish","ס־י־ם","Pi'el",
+ "מסיים mesayem,מסיימת mesayemet,מסיימים mesaymim,מסיימות mesaymot",
+ "סיימתי siyamti,סיימת siyamta,סיימת siyamt,סיים siyem,סיימה siyma,סיימנו siyamnu,סיימתם siyamtem,סיימתן siyamten,סיימו siymu",
+ "אסיים asayem,תסיים tesayem,תסיימי tesaymi,יסיים yesayem,תסיים tesayem,נסיים nesayem,תסיימו tesaymu,תסיימו tesaymu,יסיימו yesaymu"],
+["לנסוע","linso'a","to travel, drive","נ־ס־ע","Pa'al",
+ "נוסע nose'a,נוסעת nosa'at,נוסעים nos'im,נוסעות nos'ot",
+ "נסעתי nasa'ti,נסעת nasa'ta,נסעת nasa'at,נסע nasa,נסעה nas'a,נסענו nasa'nu,נסעתם nesa'tem,נסעתן nesa'ten,נסעו nas'u",
+ "אסע esa,תיסע tisa,תיסעי tis'i,ייסע yisa,תיסע tisa,ניסע nisa,תיסעו tis'u,תיסעו tis'u,ייסעו yis'u"],
+["לשחק","lesakhek","to play","ש־ח־ק","Pi'el",
+ "משחק mesakhek,משחקת mesakheket,משחקים mesakhakim,משחקות mesakhakot",
+ "שיחקתי sikhakti,שיחקת sikhakta,שיחקת sikhakt,שיחק sikhek,שיחקה sikhaka,שיחקנו sikhaknu,שיחקתם sikhaktem,שיחקתן sikhakten,שיחקו sikhaku",
+ "אשחק asakhek,תשחק tesakhek,תשחקי tesakhaki,ישחק yesakhek,תשחק tesakhek,נשחק nesakhek,תשחקו tesakhaku,תשחקו tesakhaku,ישחקו yesakhaku"],
+["לרוץ","larutz","to run","ר־ו־ץ","Pa'al",
+ "רץ rats,רצה ratsa,רצים ratsim,רצות ratsot",
+ "רצתי ratsti,רצת ratsta,רצת ratst,רץ rats,רצה ratsa,רצנו ratsnu,רצתם ratstem,רצתן ratsten,רצו ratsu",
+ "ארוץ aruts,תרוץ taruts,תרוצי tarutsi,ירוץ yaruts,תרוץ taruts,נרוץ naruts,תרוצו tarutsu,תרוצו tarutsu,ירוצו yarutsu"],
+["להרגיש","lehargish","to feel","ר־ג־ש","Hif'il",
+ "מרגיש margish,מרגישה margisha,מרגישים margishim,מרגישות margishot",
+ "הרגשתי hirgashti,הרגשת hirgashta,הרגשת hirgasht,הרגיש hirgish,הרגישה hirgisha,הרגשנו hirgashnu,הרגשתם hirgashtem,הרגשתן hirgashten,הרגישו hirgishu",
+ "ארגיש argish,תרגיש targish,תרגישי targishi,ירגיש yargish,תרגיש targish,נרגיש nargish,תרגישו targishu,תרגישו targishu,ירגישו yargishu"],
+["לזכור","lizkor","to remember","ז־כ־ר","Pa'al",
+ "זוכר zokher,זוכרת zokheret,זוכרים zokhrim,זוכרות zokhrot",
+ "זכרתי zakharti,זכרת zakharta,זכרת zakhart,זכר zakhar,זכרה zakhra,זכרנו zakharnu,זכרתם zkhartem,זכרתן zkharten,זכרו zakhru",
+ "אזכור ezkor,תזכור tizkor,תזכרי tizkeri,יזכור yizkor,תזכור tizkor,נזכור nizkor,תזכרו tizkeru,תזכרו tizkeru,יזכרו yizkeru"],
+["לשכוח","lishko'akh","to forget","ש־כ־ח","Pa'al",
+ "שוכח shokhe'akh,שוכחת shokhakhat,שוכחים shokhkhim,שוכחות shokhkhot",
+ "שכחתי shakhakhti,שכחת shakhakhta,שכחת shakhakht,שכח shakhakh,שכחה shakhkha,שכחנו shakhakhnu,שכחתם shkhakhtem,שכחתן shkhakhten,שכחו shakhkhu",
+ "אשכח eshkakh,תשכח tishkakh,תשכחי tishkekhi,ישכח yishkakh,תשכח tishkakh,נשכח nishkakh,תשכחו tishkekhu,תשכחו tishkekhu,ישכחו yishkekhu"],
+["לחכות","lekhakot","to wait","ח־כ־ה","Pi'el",
+ "מחכה mekhake,מחכה mekhaka,מחכים mekhakim,מחכות mekhakot",
+ "חיכיתי khikiti,חיכית khikita,חיכית khikit,חיכה khika,חיכתה khikta,חיכינו khikinu,חיכיתם khikitem,חיכיתן khikiten,חיכו khiku",
+ "אחכה akhake,תחכה tekhake,תחכי tekhaki,יחכה yekhake,תחכה tekhake,נחכה nekhake,תחכו tekhaku,תחכו tekhaku,יחכו yekhaku"],
+["לשלם","leshalem","to pay","ש־ל־ם","Pi'el",
+ "משלם meshalem,משלמת meshalemet,משלמים meshalmim,משלמות meshalmot",
+ "שילמתי shilamti,שילמת shilamta,שילמת shilamt,שילם shilem,שילמה shilma,שילמנו shilamnu,שילמתם shilamtem,שילמתן shilamten,שילמו shilmu",
+ "אשלם ashalem,תשלם teshalem,תשלמי teshalmi,ישלם yeshalem,תשלם teshalem,נשלם neshalem,תשלמו teshalmu,תשלמו teshalmu,ישלמו yeshalmu"],
+["להזמין","lehazmin","to invite, order","ז־מ־ן","Hif'il",
+ "מזמין mazmin,מזמינה mazmina,מזמינים mazminim,מזמינות mazminot",
+ "הזמנתי hizmanti,הזמנת hizmanta,הזמנת hizmant,הזמין hizmin,הזמינה hizmina,הזמנו hizmanu,הזמנתם hizmantem,הזמנתן hizmanten,הזמינו hizminu",
+ "אזמין azmin,תזמין tazmin,תזמיני tazmini,יזמין yazmin,תזמין tazmin,נזמין nazmin,תזמינו tazminu,תזמינו tazminu,יזמינו yazminu"],
+["להתלבש","lehitlabesh","to get dressed","ל־ב־ש","Hitpa'el",
+ "מתלבש mitlabesh,מתלבשת mitlabeshet,מתלבשים mitlabshim,מתלבשות mitlabshot",
+ "התלבשתי hitlabashti,התלבשת hitlabashta,התלבשת hitlabasht,התלבש hitlabesh,התלבשה hitlabsha,התלבשנו hitlabashnu,התלבשתם hitlabashtem,התלבשתן hitlabashten,התלבשו hitlabshu",
+ "אתלבש etlabesh,תתלבש titlabesh,תתלבשי titlabshi,יתלבש yitlabesh,תתלבש titlabesh,נתלבש nitlabesh,תתלבשו titlabshu,תתלבשו titlabshu,יתלבשו yitlabshu"],
+["לשמור","lishmor","to keep, guard","ש־מ־ר","Pa'al",
+ "שומר shomer,שומרת shomeret,שומרים shomrim,שומרות shomrot",
+ "שמרתי shamarti,שמרת shamarta,שמרת shamart,שמר shamar,שמרה shamra,שמרנו shamarnu,שמרתם shmartem,שמרתן shmarten,שמרו shamru",
+ "אשמור eshmor,תשמור tishmor,תשמרי tishmeri,ישמור yishmor,תשמור tishmor,נשמור nishmor,תשמרו tishmeru,תשמרו tishmeru,ישמרו yishmeru"],
+["לפגוש","lifgosh","to meet","פ־ג־ש","Pa'al",
+ "פוגש pogesh,פוגשת pogeshet,פוגשים pogshim,פוגשות pogshot",
+ "פגשתי pagashti,פגשת pagashta,פגשת pagasht,פגש pagash,פגשה pagsha,פגשנו pagashnu,פגשתם pgashtem,פגשתן pgashten,פגשו pagshu",
+ "אפגוש efgosh,תפגוש tifgosh,תפגשי tifgeshi,יפגוש yifgosh,תפגוש tifgosh,נפגוש nifgosh,תפגשו tifgeshu,תפגשו tifgeshu,יפגשו yifgeshu"],
+["לבקש","levakesh","to ask for, request","ב־ק־ש","Pi'el",
+ "מבקש mevakesh,מבקשת mevakeshet,מבקשים mevakshim,מבקשות mevakshot",
+ "ביקשתי bikashti,ביקשת bikashta,ביקשת bikasht,ביקש bikesh,ביקשה biksha,ביקשנו bikashnu,ביקשתם bikashtem,ביקשתן bikashten,ביקשו bikshu",
+ "אבקש avakesh,תבקש tevakesh,תבקשי tevakshi,יבקש yevakesh,תבקש tevakesh,נבקש nevakesh,תבקשו tevakshu,תבקשו tevakshu,יבקשו yevakshu"],
 ];
+const P = s => s ? s.split(",").map(x => x.trim().split(" ")) : null;
+const V = RAW.map(r => ({inf:r[0], tr:r[1], en:r[2], root:r[3], b:r[4], pres:P(r[5]), past:P(r[6]), fut:P(r[7])}));
+
 const PERS = [["אני","I"],["אתה","you (m. sg.)"],["את","you (f. sg.)"],["הוא","he"],["היא","she"],["אנחנו","we"],["אתם","you (m. pl.)"],["אתן","you (f. pl.)"],["הם / הן","they (m. / f.)"]];
 const PRES = [["אני / אתה / הוא","m. singular"],["אני / את / היא","f. singular"],["אנחנו / אתם / הם","m. plural"],["אנחנו / אתן / הן","f. plural"]];
 const TENSES = [{k:"past",en:"Past",he:"עבר"},{k:"pres",en:"Present",he:"הווה"},{k:"fut",en:"Future",he:"עתיד"}];
 const slotsFor = k => k==="pres" ? PRES : PERS;
+const LEARNED_AT = 3;   // a form counts as learned after 3 correct answers in a row
+const REVIEW_SHARE = 0.15; // share of drill questions that revisit learned verbs
 
-const S = {verbs:new Set(V.map((_,i)=>i)), tenses:new Set(["past","pres","fut"]), script:"he", mode:"table", rate:"0.9", cur:0, drill:null, right:0, total:0, streak:0};
-try{const s=JSON.parse(localStorage.getItem("hvd")||"null"); if(s){S.verbs=new Set(s.verbs.filter(i=>i<V.length)); S.tenses=new Set(s.tenses); S.script=s.script; S.mode=s.mode; if(s.rate) S.rate=s.rate;}}catch(e){}
-const save=()=>{try{localStorage.setItem("hvd",JSON.stringify({verbs:[...S.verbs],tenses:[...S.tenses],script:S.script,mode:S.mode,rate:S.rate}))}catch(e){}};
+// --- State & storage (kept in this browser only) ---
+const S = {tenses:new Set(["past","pres","fut"]), script:"he", mode:"drill", rate:"0.9", batch:5, cur:null, drill:null, right:0, total:0, streak:0, flash:"", last:""};
+let PR = {};
+try{const s=JSON.parse(localStorage.getItem("hvd")||"null"); if(s){ if(s.tenses?.length) S.tenses=new Set(s.tenses); if(s.script) S.script=s.script; if(s.mode) S.mode=s.mode; if(s.rate) S.rate=s.rate; if(s.batch) S.batch=+s.batch; }}catch(e){}
+try{PR=JSON.parse(localStorage.getItem("hvd-progress")||"{}")||{};}catch(e){PR={};}
+const save=()=>{try{localStorage.setItem("hvd",JSON.stringify({tenses:[...S.tenses],script:S.script,mode:S.mode,rate:S.rate,batch:S.batch}))}catch(e){}};
+const saveProgress=()=>{try{localStorage.setItem("hvd-progress",JSON.stringify(PR))}catch(e){}};
 const $=id=>document.getElementById(id);
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// --- Learning model ---
+const activeTenses = () => TENSES.filter(t=>S.tenses.has(t.k));
+const box = (vi,k,j) => (PR[V[vi].inf]||{})[k+j]||0;
+const formsOf = vi => activeTenses().filter(t=>V[vi][t.k]).flatMap(t=>V[vi][t.k].map((_,j)=>({k:t.k,j})));
+const mastery = vi => { const f=formsOf(vi); return f.length ? f.reduce((a,x)=>a+Math.min(box(vi,x.k,x.j),LEARNED_AT),0)/(f.length*LEARNED_AT) : 1; };
+const isLearned = vi => formsOf(vi).every(x=>box(vi,x.k,x.j)>=LEARNED_AT);
+const isNew = vi => formsOf(vi).every(x=>!(PR[V[vi].inf]||{})[x.k+x.j] && (PR[V[vi].inf]||{})[x.k+x.j]!==0);
+function rotation(){ const r=[]; for(let i=0;i<V.length&&r.length<S.batch;i++) if(!isLearned(i)) r.push(i); return r; }
+function nextUp(){ const r=rotation(); for(let i=(r.length?r[r.length-1]+1:V.length);i<V.length;i++) if(!isLearned(i)) return i; return null; }
+function record(vi,k,j,correct){
+  const wasLearned=isLearned(vi), o=PR[V[vi].inf]||(PR[V[vi].inf]={}), b=o[k+j]||0;
+  o[k+j] = correct ? b+1 : Math.max(0,b-2);
+  saveProgress();
+  if(!wasLearned && isLearned(vi)){ const n=nextUp(); S.flash=`You learned <span class="he" dir="rtl">${V[vi].inf}</span> (${esc(V[vi].en)})!`+(n!=null?` Next up: <span class="he" dir="rtl">${V[n].inf}</span>.`:""); }
+}
+const pct = vi => Math.round(mastery(vi)*100);
+const barHtml = (vi,cls="") => `<span class="bar ${cls}" aria-hidden="true"><i style="width:${pct(vi)}%"></i></span>`;
 
 // --- Answer checking ---
 const normHe = s => s.replace(/[֑-ׇ]/g,"").replace(/[^א-ת]/g,"");
 const loose = s => s.replace(/[וי]/g,"").replace(/ך/g,"כ").replace(/ם/g,"מ").replace(/ן/g,"נ").replace(/ף/g,"פ").replace(/ץ/g,"צ");
 const normTr = s => s.toLowerCase().replace(/ch/g,"kh").replace(/tz/g,"ts").replace(/x/g,"kh").replace(/[^a-z]/g,"");
-function grade(input, pair){ // returns "ok" | "near" | "no" | "empty"
+function grade(input, pair){ // "ok" | "near" | "no" | "empty"
   if(!input.trim()) return "empty";
   if(S.script==="he"){ const a=normHe(input), b=normHe(pair[0]); if(a===b) return "ok"; if(loose(a)===loose(b)) return "near"; return "no"; }
   const a=normTr(input), b=normTr(pair[1]); if(a===b) return "ok";
   if(a.replace(/h/g,"")===b.replace(/h/g,"")||a.replace(/e/g,"")===b.replace(/e/g,"")) return "near"; return "no";
 }
 const show = p => S.script==="he" ? `<span class="he" dir="rtl">${p[0]}</span> <span>(${p[1]})</span>` : `${p[1]} <span class="he" dir="rtl">${p[0]}</span>`;
-const activeVerbs = () => [...S.verbs].sort((a,b)=>a-b);
-const activeTenses = () => TENSES.filter(t=>S.tenses.has(t.k));
-
-// --- Settings UI ---
-function renderChips(){
-  $("verbChips").innerHTML = V.map((v,i)=>`<button type="button" class="chip" data-i="${i}" aria-pressed="${S.verbs.has(i)}"><span class="he" dir="rtl">${v.inf}</span><small>${v.en}</small></button>`).join("");
-  $("tenseChips").innerHTML = TENSES.map(t=>`<button type="button" class="chip" data-k="${t.k}" aria-pressed="${S.tenses.has(t.k)}">${t.en} <span class="he" dir="rtl">${t.he}</span></button>`).join("");
-  for(const [seg,key] of [["scriptSeg","script"],["modeSeg","mode"],["rateSeg","rate"]]) $(seg).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S[key]));
-}
-$("verbChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const i=+b.dataset.i; S.verbs.has(i)?S.verbs.delete(i):S.verbs.add(i); changed();};
-$("tenseChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const k=b.dataset.k; if(S.tenses.has(k)&&S.tenses.size===1) return; S.tenses.has(k)?S.tenses.delete(k):S.tenses.add(k); changed();};
-$("allVerbs").onclick=()=>{V.forEach((_,i)=>S.verbs.add(i)); changed();};
-$("noVerbs").onclick=()=>{S.verbs.clear(); changed();};
-$("scriptSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.script=b.dataset.v; changed();}};
-$("modeSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.mode=b.dataset.v; changed();}};
-$("rateSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.rate=b.dataset.v; save(); renderChips();}};
 
 // --- Read aloud (browser speech, Hebrew voice) ---
 const ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
@@ -239,96 +431,165 @@ document.addEventListener("click",e=>{
   const r=e.target.closest(".readall"); if(r){const v=V[S.cur], k=r.dataset.t;
     speak(v[k].map((p,j)=>k==="pres"?p[0]:PERS[j][0].split(" / ")[0]+" "+p[0]), r);}
 });
-function changed(){ save(); renderChips(); const av=activeVerbs(); if(!av.includes(S.cur)) S.cur=av[0]??0; S.drill=null; render(); }
+
+// --- Progress panel ---
+function renderProgress(){
+  const learned=V.filter((_,i)=>isLearned(i)).length, rot=rotation(), n=nextUp();
+  $("progress").innerHTML = `
+    <div class="prog-top">
+      <div><span class="label">Learned</span><div class="bignum">${learned} <small>of ${V.length} verbs</small></div></div>
+      ${n!=null?`<div style="text-align:end"><span class="label">Next up</span><div><span style="font-family:var(--f-heb);font-size:1.2rem" dir="rtl">${V[n].inf}</span> <span class="hint" style="display:inline">${esc(V[n].en)}</span></div></div>`:""}
+    </div>
+    <span class="bar wide" aria-hidden="true"><i style="width:${Math.round(learned/V.length*100)}%"></i></span>
+    ${S.flash?`<div class="flash" role="status">${S.flash}</div>`:""}
+    <div class="group"><span class="label">Learning now</span>
+      <div class="row">${rot.length?rot.map(i=>`<button type="button" class="chip" data-open="${i}" aria-pressed="${S.mode==="table"&&S.cur===i}" title="Open full table"><span class="he" dir="rtl">${V[i].inf}</span><small>${esc(V[i].en)}</small>${barHtml(i)}<span class="pct">${pct(i)}%</span></button>`).join(""):`<span class="hint">You've learned all ${V.length} verbs. The drill now reviews them.</span>`}</div>
+    </div>`;
+}
+$("progress").addEventListener("click",e=>{const b=e.target.closest("[data-open]"); if(b) openVerb(+b.dataset.open);});
+
+function renderList(){
+  const rot=rotation();
+  $("vlist").innerHTML = V.map((v,i)=>{
+    const st = isLearned(i) ? `<span class="st done">Learned</span>` : rot.includes(i) ? `<span class="st now">${pct(i)}%</span>` : `<span class="st wait">${pct(i)?pct(i)+"%":"Not started"}</span>`;
+    return `<li><span class="n">${i+1}</span><button type="button" data-open="${i}"><span class="he" dir="rtl">${v.inf}</span><small>${esc(v.en)}</small></button>${st}</li>`;
+  }).join("");
+}
+$("vlist").addEventListener("click",e=>{const b=e.target.closest("[data-open]"); if(b){openVerb(+b.dataset.open); $("tableView").scrollIntoView({behavior:"smooth",block:"start"});}});
+function openVerb(i){ S.cur=i; S.mode="table"; S.flash=""; save(); renderAll(); }
+
+// Reset with an inline confirmation
+$("resetRow").addEventListener("click",e=>{
+  const id=e.target.id;
+  if(id==="resetBtn") $("resetRow").innerHTML=`<span>Erase all progress on this device?</span><button class="btn danger" id="resetYes" type="button">Erase</button><button class="btn ghost" id="resetNo" type="button">Cancel</button>`;
+  if(id==="resetYes"){ PR={}; saveProgress(); S.right=S.total=S.streak=0; S.drill=null; S.cur=null; S.flash="Progress erased. Starting again from the most common verb."; renderAll(); }
+  if(id==="resetYes"||id==="resetNo") $("resetRow").innerHTML=`<button class="btn ghost" id="resetBtn" type="button">Reset my progress</button>`;
+});
+
+// --- Settings ---
+function renderSettings(){
+  $("tenseChips").innerHTML = TENSES.map(t=>`<button type="button" class="chip" data-k="${t.k}" aria-pressed="${S.tenses.has(t.k)}">${t.en} <span class="he" dir="rtl">${t.he}</span></button>`).join("");
+  for(const [seg,key] of [["scriptSeg","script"],["modeSeg","mode"],["rateSeg","rate"],["batchSeg","batch"]]) $(seg).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===String(S[key]))));
+}
+$("tenseChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const k=b.dataset.k; if(S.tenses.has(k)&&S.tenses.size===1) return; S.tenses.has(k)?S.tenses.delete(k):S.tenses.add(k); S.drill=null; save(); renderAll();};
+$("scriptSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.script=b.dataset.v; save(); renderAll();}};
+$("modeSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.mode=b.dataset.v; S.flash=""; save(); renderAll();}};
+$("batchSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.batch=+b.dataset.v; S.drill=null; save(); renderAll();}};
+$("rateSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.rate=b.dataset.v; save(); renderSettings();}};
 
 // --- Table mode ---
 function renderTable(){
-  const av=activeVerbs(), el=$("tableView");
-  if(!av.length){ el.innerHTML=`<p class="hint">Pick at least one verb above to start.</p>`; return; }
-  const v=V[S.cur], dir=S.script==="he"?"rtl":"ltr", ph=S.script==="he"?"":"e.g. "+v.past[3][1];
+  const el=$("tableView"), rot=rotation();
+  if(S.cur==null) S.cur = rot.length ? rot.reduce((a,b)=>mastery(b)<mastery(a)?b:a) : 0;
+  const v=V[S.cur], dir=S.script==="he"?"rtl":"ltr";
+  const ts=activeTenses().filter(t=>v[t.k]);
   el.innerHTML = `
     <div class="verbhead">
-      <div class="row" style="gap:14px;align-items:center">${spk(v.inf)}<span class="inf" dir="rtl">${v.inf}</span><span class="meta">${v.tr} · ${v.en}</span></div>
-      <div class="row"><span class="tag">root <span dir="rtl">${v.root}</span></span><span class="tag">${v.b}</span></div>
+      <div class="row" style="gap:14px;align-items:center">${spk(v.inf)}<span class="inf" dir="rtl">${v.inf}</span><span class="meta">${v.tr} · ${esc(v.en)}</span></div>
+      <div class="row"><span class="tag">#${S.cur+1} most common</span><span class="tag">root <span dir="rtl">${v.root}</span></span><span class="tag">${v.b}</span>${isLearned(S.cur)?`<span class="tag" style="color:var(--good);border-color:var(--good)">Learned</span>`:`${barHtml(S.cur)}<span class="pct">${pct(S.cur)}%</span>`}</div>
     </div>
+    ${!v.pres&&S.tenses.has("pres")?`<p class="hint">${v.inf} has no present tense in modern Hebrew. Hebrew just leaves the verb out ("אני בבית" = I am at home).</p>`:""}
     <form id="tform" class="tenses" autocomplete="off">
-      ${activeTenses().map(t=>`<div class="tense"><h3><span style="display:inline-flex;gap:10px;align-items:baseline;font-family:var(--f-body);color:var(--ink);font-weight:700">${t.en}<button type="button" class="readall" data-t="${t.k}" aria-label="Read all ${t.en} forms aloud">${ICON}Read all</button></span><span dir="rtl">${t.he}</span></h3>
+      ${ts.map(t=>`<div class="tense"><h3><span style="display:inline-flex;gap:10px;align-items:baseline">${t.en}<button type="button" class="readall" data-t="${t.k}" aria-label="Read all ${t.en} forms aloud">${ICON}Read all</button></span><span dir="rtl">${t.he}</span></h3>
         ${slotsFor(t.k).map((p,j)=>`<div class="slot"><label class="pron" for="a-${t.k}-${j}"><span class="he" dir="rtl">${p[0]}</span><small>${p[1]}</small></label>
-          <div class="field"><input class="ans" id="a-${t.k}-${j}" data-t="${t.k}" data-j="${j}" dir="${dir}" lang="${S.script==="he"?"he":"en"}" placeholder="${j===0&&t.k==="past"?ph:""}" spellcheck="false" autocapitalize="off"><div class="fix" hidden></div></div>${spk(v[t.k][j][0], v[t.k][j][1])}</div>`).join("")}
+          <div class="field"><input class="ans" id="a-${t.k}-${j}" data-t="${t.k}" data-j="${j}" dir="${dir}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off"><div class="fix" hidden></div></div>${spk(v[t.k][j][0], v[t.k][j][1])}</div>`).join("")}
       </div>`).join("")}
     </form>
     <div class="row" style="justify-content:space-between">
       <div class="row"><button class="btn" id="checkBtn" type="button">Check answers</button><button class="btn ghost" id="revealBtn" type="button">Show answers</button><button class="btn ghost" id="clearBtn" type="button">Clear</button></div>
       <div class="row"><span class="score" id="tscore"></span><button class="btn ghost" id="prevBtn" type="button" aria-label="Previous verb">←</button><button class="btn" id="nextBtn" type="button">Next verb →</button></div>
     </div>
-    <p class="hint">Tip: press Enter to move to the next box. Spelling variants (missing ו or י) are accepted and flagged in amber. Speaker buttons read the correct form aloud, so try answering before you listen.</p>
+    <p class="hint">Checking counts toward your progress. Next verb moves through the verbs you're learning now. Missing ו or י is accepted and flagged in amber. Speaker buttons read the correct form, so try answering first.</p>
     <p class="hint" id="voiceNote" hidden></p>`;
   voiceNote();
+  let counted=false;
   const inputs=[...el.querySelectorAll("input.ans")];
   inputs.forEach((inp,i)=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault(); (inputs[i+1]||$("checkBtn")).focus();}}));
   $("tform").onsubmit=e=>e.preventDefault();
-  $("checkBtn").onclick=()=>checkTable(false);
-  $("revealBtn").onclick=()=>checkTable(true);
-  $("clearBtn").onclick=()=>{inputs.forEach(i=>{i.value="";i.className="ans";i.nextElementSibling.hidden=true;}); $("tscore").textContent=""; inputs[0].focus();};
-  const step=d=>{const k=av.indexOf(S.cur); S.cur=av[(k+d+av.length)%av.length]; renderTable(); el.querySelector("input.ans")?.focus();};
+  const check=reveal=>{ const res=checkTable(reveal,!counted); counted=true; renderProgress(); renderList(); return res; };
+  $("checkBtn").onclick=()=>check(false);
+  $("revealBtn").onclick=()=>check(true);
+  $("clearBtn").onclick=()=>{counted=false; inputs.forEach(i=>{i.value="";i.className="ans";i.nextElementSibling.hidden=true;}); $("tscore").textContent=""; inputs[0]?.focus();};
+  const step=d=>{ const r=rotation(); const list=r.includes(S.cur)?r:[...r,S.cur].sort((a,b)=>a-b); const k=list.indexOf(S.cur);
+    S.cur=list[(k+d+list.length)%list.length]; S.flash=""; renderAll(); el.querySelector("input.ans")?.focus(); };
   $("nextBtn").onclick=()=>step(1); $("prevBtn").onclick=()=>step(-1);
 }
-function checkTable(reveal){
-  const v=V[S.cur]; let ok=0,n=0;
+function checkTable(reveal,count){
+  const vi=S.cur, v=V[vi]; let ok=0,n=0;
   document.querySelectorAll("#tform input.ans").forEach(inp=>{
-    const pair=v[inp.dataset.t][+inp.dataset.j], fix=inp.nextElementSibling;
-    if(reveal && !inp.value.trim()){ inp.value=S.script==="he"?pair[0]:pair[1]; }
-    const g=grade(inp.value,pair); n++;
-    inp.className="ans "+(g==="ok"||g==="near"?"ok":"no");
+    const k=inp.dataset.t, j=+inp.dataset.j, pair=v[k][j], fix=inp.nextElementSibling;
+    let g=grade(inp.value,pair);
+    if(count && g!=="empty") record(vi,k,j,g!=="no");
+    if(count && g==="empty" && reveal) record(vi,k,j,false);
+    if(reveal && g==="empty"){ inp.value=S.script==="he"?pair[0]:pair[1]; g="shown"; }
+    n++;
+    inp.className="ans "+(g==="ok"||g==="near"?"ok":g==="shown"?"":"no");
     if(g==="ok"){ok++; fix.hidden=true;}
     else if(g==="near"){ok++; fix.hidden=false; fix.className="fix warnc"; fix.innerHTML="Standard spelling: "+show(pair);}
+    else if(g==="shown"){fix.hidden=true;}
     else {fix.hidden=false; fix.className="fix"; fix.innerHTML=(g==="empty"?"Answer: ":"Correct: ")+show(pair);}
   });
   $("tscore").textContent = reveal ? "" : `${ok} / ${n} correct`;
 }
 
-// --- Drill mode ---
+// --- Drill mode: weak forms of the current verbs come up most; learned verbs come back now and then ---
+function pickWeighted(items){ const tot=items.reduce((a,x)=>a+x.w,0); let r=Math.random()*tot; for(const x of items){ r-=x.w; if(r<=0) return x; } return items[items.length-1]; }
 function newDrill(){
-  const av=activeVerbs(), ts=activeTenses(); if(!av.length) return null;
-  const vi=av[Math.floor(Math.random()*av.length)], t=ts[Math.floor(Math.random()*ts.length)], sl=slotsFor(t.k), j=Math.floor(Math.random()*sl.length);
-  return {vi,t,j,done:false};
+  const rot=rotation(), learned=V.map((_,i)=>i).filter(isLearned);
+  let pool;
+  if(learned.length && (!rot.length || Math.random()<REVIEW_SHARE)){
+    pool = learned.flatMap(vi=>formsOf(vi).map(f=>({vi,...f,w:1,review:true})));
+  } else {
+    pool = rot.flatMap(vi=>formsOf(vi).map(f=>({vi,...f,w:[6,4,2,1][Math.min(box(vi,f.k,f.j),3)]})));
+  }
+  if(!pool.length) return null;
+  const fresh = pool.filter(x=>`${x.vi}${x.k}${x.j}`!==S.last);
+  const d = pickWeighted(fresh.length?fresh:pool);
+  S.last=`${d.vi}${d.k}${d.j}`; d.isNew=isNew(d.vi); d.done=false; return d;
 }
 function renderDrill(){
   const el=$("drillView");
-  if(!activeVerbs().length){ el.innerHTML=`<p class="hint">Pick at least one verb above to start.</p>`; return; }
   if(!S.drill) S.drill=newDrill();
-  const d=S.drill, v=V[d.vi], p=slotsFor(d.t.k)[d.j];
+  const d=S.drill; if(!d){ el.innerHTML=`<p class="hint">Nothing to practice with these settings.</p>`; return; }
+  const v=V[d.vi], t=TENSES.find(x=>x.k===d.k), p=slotsFor(d.k)[d.j];
   el.innerHTML=`
-    <div class="row" style="justify-content:center;gap:10px"><span class="tag">${d.t.en} · <span dir="rtl">${d.t.he}</span></span><span class="tag">${v.b}</span></div>
-    <div><div class="row" style="justify-content:center;gap:10px">${spk(v.inf)}<span style="font-family:var(--f-heb);font-size:1.6rem" dir="rtl">${v.inf}</span></div><div class="prompt-sub">${v.tr} · ${v.en}</div></div>
+    <div class="row" style="justify-content:center;gap:10px">${d.isNew?`<span class="tag new">New verb</span>`:""}${d.review?`<span class="tag">Review</span>`:""}<span class="tag">${t.en} · <span dir="rtl">${t.he}</span></span><span class="tag">${v.b}</span></div>
+    <div><div class="row" style="justify-content:center;gap:10px">${spk(v.inf)}<span style="font-family:var(--f-heb);font-size:1.6rem" dir="rtl">${v.inf}</span></div><div class="prompt-sub">${v.tr} · ${esc(v.en)}</div></div>
     <div><div class="prompt-pron" dir="rtl">${p[0]}</div><div class="prompt-sub">${p[1]}</div></div>
-    <form id="dform" style="width:100%;display:flex;justify-content:center" autocomplete="off"><label for="dans" class="label" hidden>Your answer</label>
-      <input class="ans" id="dans" dir="${S.script==="he"?"rtl":"ltr"}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off" placeholder="${S.script==="he"?"הקלידו כאן":"type here"}"></form>
+    <form id="dform" style="width:100%;display:flex;justify-content:center" autocomplete="off">
+      <input class="ans" id="dans" aria-label="Your answer" dir="${S.script==="he"?"rtl":"ltr"}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off" placeholder="${S.script==="he"?"הקלידו כאן":"type here"}"></form>
     <div class="feedback" id="dfb" aria-live="polite"></div>
-    <div class="row" style="justify-content:center"><button class="btn" id="dcheck" type="button">Check</button><button class="btn ghost" id="dskip" type="button">Skip</button></div>
-    <div class="stats"><span>Score <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="dcheck" type="button">Check</button><button class="btn ghost" id="dskip" type="button">Skip</button><button class="btn ghost" id="dtable" type="button">See full table</button></div>
+    <div class="stats"><span>This session <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span></div>
     <p class="hint" id="voiceNote" hidden></p>`;
   voiceNote();
   const inp=$("dans");
-  const act=()=>{ if(S.drill.done){ S.drill=newDrill(); renderDrill(); $("dans").focus(); return; }
-    const pair=v[d.t.k][d.j], g=grade(inp.value,pair); if(g==="empty"){inp.focus(); return;}
+  const act=()=>{
+    if(S.drill.done){ S.drill=newDrill(); S.flash=""; renderProgress(); renderDrill(); $("dans").focus(); return; }
+    const pair=v[d.k][d.j], g=grade(inp.value,pair); if(g==="empty"){inp.focus(); return;}
     d.done=true; S.total++;
-    const sayIt=(d.t.k==="pres"?"":p[0].split(" / ")[0]+" ")+pair[0];
-    if(g!=="no"){S.right++; S.streak++; inp.className="ans ok"; $("dfb").innerHTML=`<span class="ok-t">Correct!</span>${g==="near"?` <span class="hint">Standard spelling: ${show(pair)}</span>`:""}`;}
+    const sayIt=(d.k==="pres"?"":p[0].split(" / ")[0]+" ")+pair[0];
+    record(d.vi,d.k,d.j,g!=="no");
+    if(g!=="no"){S.right++; S.streak++; inp.className="ans ok"; $("dfb").innerHTML=`<span class="ok-t">Correct!</span>${g==="near"?` <span class="hint" style="display:inline">Standard spelling: ${show(pair)}</span>`:""}`;}
     else {S.streak=0; inp.className="ans no"; $("dfb").innerHTML=`<span class="no-t">Not quite.</span> Correct: ${show(pair)}`;}
     $("dfb").insertAdjacentHTML("beforeend",` <span style="display:inline-block;vertical-align:middle">${spk(sayIt, pair[1])}</span>`); speak([sayIt]);
-    $("dcheck").textContent="Next →"; el.querySelector(".stats").innerHTML=`<span>Score <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span>`; };
+    $("dcheck").textContent="Next →";
+    el.querySelector(".stats").innerHTML=`<span>This session <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span>`;
+    renderProgress(); renderList();
+  };
   $("dform").onsubmit=e=>{e.preventDefault(); act();};
   $("dcheck").onclick=act;
   $("dskip").onclick=()=>{S.drill=newDrill(); renderDrill(); $("dans").focus();};
+  $("dtable").onclick=()=>openVerb(d.vi);
 }
 
-// --- On-screen Hebrew keyboard ---
+// --- On-screen Hebrew keyboard (desktop only) ---
 const KB=[["ק","ר","א","ט","ו","ן","ם","פ"],["ש","ד","ג","כ","ע","י","ח","ל","ך","ף"],["ז","ס","ב","ה","נ","מ","צ","ת","ץ"]];
 let lastInput=null;
 document.addEventListener("focusin",e=>{if(e.target.matches("input.ans")) lastInput=e.target;});
 function renderKb(){
   const k=$("kb"); k.hidden = S.script!=="he";
+  if(k.childElementCount) return;
   k.innerHTML = KB.map(r=>`<div class="krow">${r.map(c=>`<button type="button" class="key" data-c="${c}">${c}</button>`).join("")}</div>`).join("")
    + `<div class="krow"><button type="button" class="key wide" data-c="BK">⌫ Delete</button><button type="button" class="key wide" data-c=" ">Space</button><button type="button" class="key wide" data-c="EN">Enter ↵</button></div>`;
 }
@@ -337,19 +598,20 @@ $("kb").addEventListener("click",e=>{
   const b=e.target.closest(".key"); if(!b) return;
   const inp = lastInput && document.body.contains(lastInput) ? lastInput : document.querySelector("input.ans"); if(!inp) return;
   inp.focus(); const c=b.dataset.c;
-  if(c==="EN"){ inp.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})); if(inp.form && inp.id==="dans") inp.form.requestSubmit(); return; }
+  if(c==="EN"){ if(inp.id==="dans") inp.form.requestSubmit(); else inp.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})); return; }
   const s=inp.selectionStart??inp.value.length, en=inp.selectionEnd??s;
   if(c==="BK"){ if(s===en&&s>0){inp.value=inp.value.slice(0,s-1)+inp.value.slice(en); inp.setSelectionRange(s-1,s-1);} else {inp.value=inp.value.slice(0,s)+inp.value.slice(en); inp.setSelectionRange(s,s);} }
   else { inp.value=inp.value.slice(0,s)+c+inp.value.slice(en); inp.setSelectionRange(s+1,s+1); }
   inp.classList.remove("ok","no");
 });
 
-function render(){
+function renderAll(){
+  renderSettings(); renderProgress(); renderList();
   $("tableView").hidden = S.mode!=="table"; $("drillView").hidden = S.mode!=="drill";
-  S.mode==="table" ? renderTable() : renderDrill(); renderKb();
+  S.mode==="table" ? renderTable() : renderDrill();
+  renderKb();
 }
-S.cur = activeVerbs()[0] ?? 0;
-renderChips(); render();
+renderAll();
 </script>
 </body>
 </html>
