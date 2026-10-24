@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Hebrew Verb Drills</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one centered working column — controls bar, then the practice sheet; keyboard docks below */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#18212f; --muted:#5c6779; --line:#d9dee7;
+  --accent:#2f5bd3; --accent-soft:#e6ecfb; --good:#1d8a55; --good-soft:#e2f4ea; --bad:#c23b3b; --bad-soft:#fbe7e7; --warn:#a86b00;
+  --f-heb:"Frank Ruhl Libre","Times New Roman",serif; --f-body:"Assistant",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161f; --surface:#1a212d; --ink:#e7ebf2; --muted:#9aa4b5; --line:#2c3545;
+  --accent:#7d9dff; --accent-soft:#232f4a; --good:#4cc68a; --good-soft:#173326; --bad:#ff7a7a; --bad-soft:#3a1d1f; --warn:#e2a33c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161f; --surface:#1a212d; --ink:#e7ebf2; --muted:#9aa4b5; --line:#2c3545;
+  --accent:#7d9dff; --accent-soft:#232f4a; --good:#4cc68a; --good-soft:#173326; --bad:#ff7a7a; --bad-soft:#3a1d1f; --warn:#e2a33c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding-block:28px 220px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--f-heb);font-size:2rem;margin:0;text-wrap:balance;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+header h1 span[lang=he]{color:var(--accent)}
+header p{margin:4px 0 0;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.group{display:flex;flex-direction:column;gap:6px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+button{font:inherit;cursor:pointer}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;display:inline-flex;gap:6px;align-items:baseline}
+.chip .he{font-family:var(--f-heb);font-size:1.05rem}
+.chip small{color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);padding:6px 12px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--surface)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--surface);border-radius:8px;padding:8px 16px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:focus-visible,.chip:focus-visible,.seg button:focus-visible,input:focus-visible,.key:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.linkish{background:none;border:0;color:var(--accent);padding:0;text-decoration:underline;text-underline-offset:3px}
+/* Verb heading */
+.verbhead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
+.verbhead .inf{font-family:var(--f-heb);font-size:2.2rem;font-weight:700;line-height:1.1}
+.verbhead .meta{color:var(--muted)}
+.tag{font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:var(--muted)}
+/* Table form */
+.tenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.tense{border-top:3px solid var(--accent);padding-top:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tense h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;align-items:baseline}
+.tense h3 span{font-family:var(--f-heb);color:var(--muted);font-weight:500}
+.slot{display:grid;grid-template-columns:92px 1fr auto;gap:8px;align-items:start}
+.pron{display:flex;flex-direction:column;line-height:1.15;padding-top:6px}
+.pron .he{font-family:var(--f-heb);font-size:1.1rem}
+.pron small{color:var(--muted);font-size:.72rem}
+.field{display:flex;flex-direction:column;gap:2px;min-width:0}
+input.ans{width:100%;font:inherit;font-size:1.1rem;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input.ans[dir=rtl]{font-family:var(--f-heb);font-size:1.25rem}
+input.ans.ok{border-color:var(--good);background:var(--good-soft)}
+input.ans.no{border-color:var(--bad);background:var(--bad-soft)}
+.fix{font-size:.85rem;color:var(--bad)}
+.fix.warnc{color:var(--warn)}
+.fix .he{font-family:var(--f-heb);font-size:1.05rem}
+.score{font-weight:700;font-variant-numeric:tabular-nums}
+/* Drill */
+.drill{align-items:center;text-align:center;gap:16px;padding-block:28px}
+.prompt-pron{font-family:var(--f-heb);font-size:2.4rem;line-height:1}
+.prompt-sub{color:var(--muted)}
+.drill input.ans{max-width:360px;text-align:center;font-size:1.5rem}
+.feedback{min-height:2.6em}
+.feedback .he{font-family:var(--f-heb);font-size:1.3rem}
+.ok-t{color:var(--good);font-weight:700}.no-t{color:var(--bad);font-weight:700}
+.stats{display:flex;gap:20px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+/* Keyboard */
+.kb{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:5px;align-items:center;z-index:5}
+.kb .krow{display:flex;gap:4px;direction:rtl;justify-content:center;width:100%;max-width:640px}
+.key{flex:1 1 0;min-width:0;max-width:52px;height:42px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font-family:var(--f-heb);font-size:1.25rem;padding:0}
+.key.wide{max-width:140px;flex:3 1 0;font-family:var(--f-body);font-size:.9rem}
+.key:active{background:var(--accent-soft)}
+.hint{font-size:.85rem;color:var(--muted)}
+.spk{border:1px solid var(--line);background:transparent;color:var(--accent);border-radius:999px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+.spk svg{width:16px;height:16px;fill:currentColor}
+.spk:hover,.spk.playing{background:var(--accent-soft);border-color:var(--accent)}
+.spk:focus-visible,.readall:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.readall{border:0;background:none;color:var(--accent);font:inherit;font-size:.85rem;font-weight:600;display:inline-flex;gap:4px;align-items:center;padding:0}
+.readall svg{width:13px;height:13px;fill:currentColor}
+@media (max-width:480px){.slot{grid-template-columns:78px 1fr auto}.verbhead .inf{font-size:1.8rem}}
+@media (prefers-reduced-motion:no-preference){input.ans{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Hebrew Verb Drills <span lang="he" dir="rtl">תרגול פעלים</span></h1>
+    <p>Fill in past, present and future for every person, number and gender. Pick verbs and tenses, then work the full table or a quick random drill.</p>
+  </header>
+
+  <section class="panel" aria-label="Settings">
+    <div class="group">
+      <div class="row" style="justify-content:space-between"><span class="label">Verbs</span>
+        <span class="row"><button class="linkish" id="allVerbs" type="button">Select all</button><button class="linkish" id="noVerbs" type="button">Clear</button></span></div>
+      <div class="row" id="verbChips"></div>
+    </div>
+    <div class="controls">
+      <div class="group"><span class="label">Tenses</span>
+        <div class="row" id="tenseChips"></div></div>
+      <div class="group"><span class="label">Answer in</span>
+        <div class="seg" id="scriptSeg"><button type="button" data-v="he" aria-pressed="true">עברית</button><button type="button" data-v="tr" aria-pressed="false">Transliteration</button></div></div>
+      <div class="group"><span class="label">Mode</span>
+        <div class="seg" id="modeSeg"><button type="button" data-v="table" aria-pressed="true">Full table</button><button type="button" data-v="drill" aria-pressed="false">Quick drill</button></div></div>
+      <div class="group"><span class="label">Read-aloud speed</span>
+        <div class="seg" id="rateSeg"><button type="button" data-v="0.9" aria-pressed="true">Normal</button><button type="button" data-v="0.6" aria-pressed="false">Slow</button></div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="tableView" aria-label="Conjugation table"></section>
+  <section class="panel drill" id="drillView" aria-label="Quick drill" hidden></section>
+</div>
+
+<div class="kb" id="kb" aria-label="Hebrew keyboard"></div>
+
+<script>
+// Each verb: present [m.s, f.s, m.pl, f.pl]; past & future [I, you m.s, you f.s, he, she, we, you m.pl, you f.pl, they]
+const V = [
+ {inf:"לכתוב",tr:"likhtov",en:"to write",root:"כ־ת־ב",b:"Pa'al",
+  pres:[["כותב","kotev"],["כותבת","kotevet"],["כותבים","kotvim"],["כותבות","kotvot"]],
+  past:[["כתבתי","katavti"],["כתבת","katavta"],["כתבת","katavt"],["כתב","katav"],["כתבה","katva"],["כתבנו","katavnu"],["כתבתם","ktavtem"],["כתבתן","ktavten"],["כתבו","katvu"]],
+  fut:[["אכתוב","ekhtov"],["תכתוב","tikhtov"],["תכתבי","tikhtevi"],["יכתוב","yikhtov"],["תכתוב","tikhtov"],["נכתוב","nikhtov"],["תכתבו","tikhtevu"],["תכתבו","tikhtevu"],["יכתבו","yikhtevu"]]},
+ {inf:"ללמוד",tr:"lilmod",en:"to learn",root:"ל־מ־ד",b:"Pa'al",
+  pres:[["לומד","lomed"],["לומדת","lomedet"],["לומדים","lomdim"],["לומדות","lomdot"]],
+  past:[["למדתי","lamadeti"],["למדת","lamadeta"],["למדת","lamadet"],["למד","lamad"],["למדה","lamda"],["למדנו","lamadnu"],["למדתם","lemadetem"],["למדתן","lemadeten"],["למדו","lamdu"]],
+  fut:[["אלמד","elmad"],["תלמד","tilmad"],["תלמדי","tilmedi"],["ילמד","yilmad"],["תלמד","tilmad"],["נלמד","nilmad"],["תלמדו","tilmedu"],["תלמדו","tilmedu"],["ילמדו","yilmedu"]]},
+ {inf:"לשמור",tr:"lishmor",en:"to keep, guard",root:"ש־מ־ר",b:"Pa'al",
+  pres:[["שומר","shomer"],["שומרת","shomeret"],["שומרים","shomrim"],["שומרות","shomrot"]],
+  past:[["שמרתי","shamarti"],["שמרת","shamarta"],["שמרת","shamart"],["שמר","shamar"],["שמרה","shamra"],["שמרנו","shamarnu"],["שמרתם","shmartem"],["שמרתן","shmarten"],["שמרו","shamru"]],
+  fut:[["אשמור","eshmor"],["תשמור","tishmor"],["תשמרי","tishmeri"],["ישמור","yishmor"],["תשמור","tishmor"],["נשמור","nishmor"],["תשמרו","tishmeru"],["תשמרו","tishmeru"],["ישמרו","yishmeru"]]},
+ {inf:"ללכת",tr:"lalekhet",en:"to go, walk",root:"ה־ל־ך",b:"Pa'al",
+  pres:[["הולך","holekh"],["הולכת","holekhet"],["הולכים","holkhim"],["הולכות","holkhot"]],
+  past:[["הלכתי","halakhti"],["הלכת","halakhta"],["הלכת","halakht"],["הלך","halakh"],["הלכה","halkha"],["הלכנו","halakhnu"],["הלכתם","halakhtem"],["הלכתן","halakhten"],["הלכו","halkhu"]],
+  fut:[["אלך","elekh"],["תלך","telekh"],["תלכי","telkhi"],["ילך","yelekh"],["תלך","telekh"],["נלך","nelekh"],["תלכו","telkhu"],["תלכו","telkhu"],["ילכו","yelkhu"]]},
+ {inf:"לאכול",tr:"le'ekhol",en:"to eat",root:"א־כ־ל",b:"Pa'al",
+  pres:[["אוכל","okhel"],["אוכלת","okhelet"],["אוכלים","okhlim"],["אוכלות","okhlot"]],
+  past:[["אכלתי","akhalti"],["אכלת","akhalta"],["אכלת","akhalt"],["אכל","akhal"],["אכלה","akhla"],["אכלנו","akhalnu"],["אכלתם","akhaltem"],["אכלתן","akhalten"],["אכלו","akhlu"]],
+  fut:[["אוכל","okhal"],["תאכל","tokhal"],["תאכלי","tokhli"],["יאכל","yokhal"],["תאכל","tokhal"],["נאכל","nokhal"],["תאכלו","tokhlu"],["תאכלו","tokhlu"],["יאכלו","yokhlu"]]},
+ {inf:"לאהוב",tr:"le'ehov",en:"to love",root:"א־ה־ב",b:"Pa'al",
+  pres:[["אוהב","ohev"],["אוהבת","ohevet"],["אוהבים","ohavim"],["אוהבות","ohavot"]],
+  past:[["אהבתי","ahavti"],["אהבת","ahavta"],["אהבת","ahavt"],["אהב","ahav"],["אהבה","ahava"],["אהבנו","ahavnu"],["אהבתם","ahavtem"],["אהבתן","ahavten"],["אהבו","ahavu"]],
+  fut:[["אוהב","ohav"],["תאהב","tohav"],["תאהבי","tohavi"],["יאהב","yohav"],["תאהב","tohav"],["נאהב","nohav"],["תאהבו","tohavu"],["תאהבו","tohavu"],["יאהבו","yohavu"]]},
+ {inf:"לגור",tr:"lagur",en:"to live (reside)",root:"ג־ו־ר",b:"Pa'al",
+  pres:[["גר","gar"],["גרה","gara"],["גרים","garim"],["גרות","garot"]],
+  past:[["גרתי","garti"],["גרת","garta"],["גרת","gart"],["גר","gar"],["גרה","gara"],["גרנו","garnu"],["גרתם","gartem"],["גרתן","garten"],["גרו","garu"]],
+  fut:[["אגור","agur"],["תגור","tagur"],["תגורי","taguri"],["יגור","yagur"],["תגור","tagur"],["נגור","nagur"],["תגורו","taguru"],["תגורו","taguru"],["יגורו","yaguru"]]},
+ {inf:"לרוץ",tr:"larutz",en:"to run",root:"ר־ו־ץ",b:"Pa'al",
+  pres:[["רץ","rats"],["רצה","ratsa"],["רצים","ratsim"],["רצות","ratsot"]],
+  past:[["רצתי","ratsti"],["רצת","ratsta"],["רצת","ratst"],["רץ","rats"],["רצה","ratsa"],["רצנו","ratsnu"],["רצתם","ratstem"],["רצתן","ratsten"],["רצו","ratsu"]],
+  fut:[["ארוץ","aruts"],["תרוץ","taruts"],["תרוצי","tarutsi"],["ירוץ","yaruts"],["תרוץ","taruts"],["נרוץ","naruts"],["תרוצו","tarutsu"],["תרוצו","tarutsu"],["ירוצו","yarutsu"]]},
+ {inf:"לקנות",tr:"liknot",en:"to buy",root:"ק־נ־ה",b:"Pa'al",
+  pres:[["קונה","kone"],["קונה","kona"],["קונים","konim"],["קונות","konot"]],
+  past:[["קניתי","kaniti"],["קנית","kanita"],["קנית","kanit"],["קנה","kana"],["קנתה","kanta"],["קנינו","kaninu"],["קניתם","knitem"],["קניתן","kniten"],["קנו","kanu"]],
+  fut:[["אקנה","ekne"],["תקנה","tikne"],["תקני","tikni"],["יקנה","yikne"],["תקנה","tikne"],["נקנה","nikne"],["תקנו","tiknu"],["תקנו","tiknu"],["יקנו","yiknu"]]},
+ {inf:"לדבר",tr:"ledaber",en:"to speak",root:"ד־ב־ר",b:"Pi'el",
+  pres:[["מדבר","medaber"],["מדברת","medaberet"],["מדברים","medabrim"],["מדברות","medabrot"]],
+  past:[["דיברתי","dibarti"],["דיברת","dibarta"],["דיברת","dibart"],["דיבר","diber"],["דיברה","dibra"],["דיברנו","dibarnu"],["דיברתם","dibartem"],["דיברתן","dibarten"],["דיברו","dibru"]],
+  fut:[["אדבר","adaber"],["תדבר","tedaber"],["תדברי","tedabri"],["ידבר","yedaber"],["תדבר","tedaber"],["נדבר","nedaber"],["תדברו","tedabru"],["תדברו","tedabru"],["ידברו","yedabru"]]},
+ {inf:"להזמין",tr:"lehazmin",en:"to invite, order",root:"ז־מ־נ",b:"Hif'il",
+  pres:[["מזמין","mazmin"],["מזמינה","mazmina"],["מזמינים","mazminim"],["מזמינות","mazminot"]],
+  past:[["הזמנתי","hizmanti"],["הזמנת","hizmanta"],["הזמנת","hizmant"],["הזמין","hizmin"],["הזמינה","hizmina"],["הזמנו","hizmanu"],["הזמנתם","hizmantem"],["הזמנתן","hizmanten"],["הזמינו","hizminu"]],
+  fut:[["אזמין","azmin"],["תזמין","tazmin"],["תזמיני","tazmini"],["יזמין","yazmin"],["תזמין","tazmin"],["נזמין","nazmin"],["תזמינו","tazminu"],["תזמינו","tazminu"],["יזמינו","yazminu"]]},
+ {inf:"להתלבש",tr:"lehitlabesh",en:"to get dressed",root:"ל־ב־ש",b:"Hitpa'el",
+  pres:[["מתלבש","mitlabesh"],["מתלבשת","mitlabeshet"],["מתלבשים","mitlabshim"],["מתלבשות","mitlabshot"]],
+  past:[["התלבשתי","hitlabashti"],["התלבשת","hitlabashta"],["התלבשת","hitlabasht"],["התלבש","hitlabesh"],["התלבשה","hitlabsha"],["התלבשנו","hitlabashnu"],["התלבשתם","hitlabashtem"],["התלבשתן","hitlabashten"],["התלבשו","hitlabshu"]],
+  fut:[["אתלבש","etlabesh"],["תתלבש","titlabesh"],["תתלבשי","titlabshi"],["יתלבש","yitlabesh"],["תתלבש","titlabesh"],["נתלבש","nitlabesh"],["תתלבשו","titlabshu"],["תתלבשו","titlabshu"],["יתלבשו","yitlabshu"]]},
+];
+const PERS = [["אני","I"],["אתה","you (m. sg.)"],["את","you (f. sg.)"],["הוא","he"],["היא","she"],["אנחנו","we"],["אתם","you (m. pl.)"],["אתן","you (f. pl.)"],["הם / הן","they (m. / f.)"]];
+const PRES = [["אני / אתה / הוא","m. singular"],["אני / את / היא","f. singular"],["אנחנו / אתם / הם","m. plural"],["אנחנו / אתן / הן","f. plural"]];
+const TENSES = [{k:"past",en:"Past",he:"עבר"},{k:"pres",en:"Present",he:"הווה"},{k:"fut",en:"Future",he:"עתיד"}];
+const slotsFor = k => k==="pres" ? PRES : PERS;
+
+const S = {verbs:new Set(V.map((_,i)=>i)), tenses:new Set(["past","pres","fut"]), script:"he", mode:"table", rate:"0.9", cur:0, drill:null, right:0, total:0, streak:0};
+try{const s=JSON.parse(localStorage.getItem("hvd")||"null"); if(s){S.verbs=new Set(s.verbs.filter(i=>i<V.length)); S.tenses=new Set(s.tenses); S.script=s.script; S.mode=s.mode; if(s.rate) S.rate=s.rate;}}catch(e){}
+const save=()=>{try{localStorage.setItem("hvd",JSON.stringify({verbs:[...S.verbs],tenses:[...S.tenses],script:S.script,mode:S.mode,rate:S.rate}))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// --- Answer checking ---
+const normHe = s => s.replace(/[֑-ׇ]/g,"").replace(/[^א-ת]/g,"");
+const loose = s => s.replace(/[וי]/g,"").replace(/ך/g,"כ").replace(/ם/g,"מ").replace(/ן/g,"נ").replace(/ף/g,"פ").replace(/ץ/g,"צ");
+const normTr = s => s.toLowerCase().replace(/ch/g,"kh").replace(/tz/g,"ts").replace(/x/g,"kh").replace(/[^a-z]/g,"");
+function grade(input, pair){ // returns "ok" | "near" | "no" | "empty"
+  if(!input.trim()) return "empty";
+  if(S.script==="he"){ const a=normHe(input), b=normHe(pair[0]); if(a===b) return "ok"; if(loose(a)===loose(b)) return "near"; return "no"; }
+  const a=normTr(input), b=normTr(pair[1]); if(a===b) return "ok";
+  if(a.replace(/h/g,"")===b.replace(/h/g,"")||a.replace(/e/g,"")===b.replace(/e/g,"")) return "near"; return "no";
+}
+const show = p => S.script==="he" ? `<span class="he" dir="rtl">${p[0]}</span> <span>(${p[1]})</span>` : `${p[1]} <span class="he" dir="rtl">${p[0]}</span>`;
+const activeVerbs = () => [...S.verbs].sort((a,b)=>a-b);
+const activeTenses = () => TENSES.filter(t=>S.tenses.has(t.k));
+
+// --- Settings UI ---
+function renderChips(){
+  $("verbChips").innerHTML = V.map((v,i)=>`<button type="button" class="chip" data-i="${i}" aria-pressed="${S.verbs.has(i)}"><span class="he" dir="rtl">${v.inf}</span><small>${v.en}</small></button>`).join("");
+  $("tenseChips").innerHTML = TENSES.map(t=>`<button type="button" class="chip" data-k="${t.k}" aria-pressed="${S.tenses.has(t.k)}">${t.en} <span class="he" dir="rtl">${t.he}</span></button>`).join("");
+  for(const [seg,key] of [["scriptSeg","script"],["modeSeg","mode"],["rateSeg","rate"]]) $(seg).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S[key]));
+}
+$("verbChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const i=+b.dataset.i; S.verbs.has(i)?S.verbs.delete(i):S.verbs.add(i); changed();};
+$("tenseChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const k=b.dataset.k; if(S.tenses.has(k)&&S.tenses.size===1) return; S.tenses.has(k)?S.tenses.delete(k):S.tenses.add(k); changed();};
+$("allVerbs").onclick=()=>{V.forEach((_,i)=>S.verbs.add(i)); changed();};
+$("noVerbs").onclick=()=>{S.verbs.clear(); changed();};
+$("scriptSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.script=b.dataset.v; changed();}};
+$("modeSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.mode=b.dataset.v; changed();}};
+$("rateSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.rate=b.dataset.v; save(); renderChips();}};
+
+// --- Read aloud (browser speech, Hebrew voice) ---
+const ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const spk=(text,label)=>`<button type="button" class="spk" data-say="${esc(text)}" aria-label="Read aloud: ${esc(label||text)}" title="Read aloud">${ICON}</button>`;
+const canSpeak='speechSynthesis' in window;
+const heVoice=()=>canSpeak?speechSynthesis.getVoices().find(v=>/^(he|iw)/i.test(v.lang)):null;
+if(canSpeak) speechSynthesis.onvoiceschanged=()=>voiceNote();
+function voiceNote(){const n=$("voiceNote"); if(!n) return; n.hidden=canSpeak&&!!heVoice(); n.textContent=canSpeak?"No Hebrew voice found on this device, so read-aloud may sound wrong. Add a Hebrew voice in your system's speech or language settings.":"This browser can't read text aloud.";}
+function speak(list,btn){
+  if(!canSpeak) return voiceNote();
+  speechSynthesis.cancel(); document.querySelectorAll(".playing").forEach(b=>b.classList.remove("playing"));
+  const voice=heVoice(); if(btn) btn.classList.add("playing");
+  list.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t); u.lang="he-IL"; if(voice) u.voice=voice; u.rate=+S.rate;
+    if(i===list.length-1) u.onend=u.onerror=()=>btn&&btn.classList.remove("playing"); speechSynthesis.speak(u);});
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".spk"); if(b){speak([b.dataset.say],b); return;}
+  const r=e.target.closest(".readall"); if(r){const v=V[S.cur], k=r.dataset.t;
+    speak(v[k].map((p,j)=>k==="pres"?p[0]:PERS[j][0].split(" / ")[0]+" "+p[0]), r);}
+});
+function changed(){ save(); renderChips(); const av=activeVerbs(); if(!av.includes(S.cur)) S.cur=av[0]??0; S.drill=null; render(); }
+
+// --- Table mode ---
+function renderTable(){
+  const av=activeVerbs(), el=$("tableView");
+  if(!av.length){ el.innerHTML=`<p class="hint">Pick at least one verb above to start.</p>`; return; }
+  const v=V[S.cur], dir=S.script==="he"?"rtl":"ltr", ph=S.script==="he"?"":"e.g. "+v.past[3][1];
+  el.innerHTML = `
+    <div class="verbhead">
+      <div class="row" style="gap:14px;align-items:center">${spk(v.inf)}<span class="inf" dir="rtl">${v.inf}</span><span class="meta">${v.tr} · ${v.en}</span></div>
+      <div class="row"><span class="tag">root <span dir="rtl">${v.root}</span></span><span class="tag">${v.b}</span></div>
+    </div>
+    <form id="tform" class="tenses" autocomplete="off">
+      ${activeTenses().map(t=>`<div class="tense"><h3><span style="display:inline-flex;gap:10px;align-items:baseline;font-family:var(--f-body);color:var(--ink);font-weight:700">${t.en}<button type="button" class="readall" data-t="${t.k}" aria-label="Read all ${t.en} forms aloud">${ICON}Read all</button></span><span dir="rtl">${t.he}</span></h3>
+        ${slotsFor(t.k).map((p,j)=>`<div class="slot"><label class="pron" for="a-${t.k}-${j}"><span class="he" dir="rtl">${p[0]}</span><small>${p[1]}</small></label>
+          <div class="field"><input class="ans" id="a-${t.k}-${j}" data-t="${t.k}" data-j="${j}" dir="${dir}" lang="${S.script==="he"?"he":"en"}" placeholder="${j===0&&t.k==="past"?ph:""}" spellcheck="false" autocapitalize="off"><div class="fix" hidden></div></div>${spk(v[t.k][j][0], v[t.k][j][1])}</div>`).join("")}
+      </div>`).join("")}
+    </form>
+    <div class="row" style="justify-content:space-between">
+      <div class="row"><button class="btn" id="checkBtn" type="button">Check answers</button><button class="btn ghost" id="revealBtn" type="button">Show answers</button><button class="btn ghost" id="clearBtn" type="button">Clear</button></div>
+      <div class="row"><span class="score" id="tscore"></span><button class="btn ghost" id="prevBtn" type="button" aria-label="Previous verb">←</button><button class="btn" id="nextBtn" type="button">Next verb →</button></div>
+    </div>
+    <p class="hint">Tip: press Enter to move to the next box. Spelling variants (missing ו or י) are accepted and flagged in amber. Speaker buttons read the correct form aloud, so try answering before you listen.</p>
+    <p class="hint" id="voiceNote" hidden></p>`;
+  voiceNote();
+  const inputs=[...el.querySelectorAll("input.ans")];
+  inputs.forEach((inp,i)=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault(); (inputs[i+1]||$("checkBtn")).focus();}}));
+  $("tform").onsubmit=e=>e.preventDefault();
+  $("checkBtn").onclick=()=>checkTable(false);
+  $("revealBtn").onclick=()=>checkTable(true);
+  $("clearBtn").onclick=()=>{inputs.forEach(i=>{i.value="";i.className="ans";i.nextElementSibling.hidden=true;}); $("tscore").textContent=""; inputs[0].focus();};
+  const step=d=>{const k=av.indexOf(S.cur); S.cur=av[(k+d+av.length)%av.length]; renderTable(); el.querySelector("input.ans")?.focus();};
+  $("nextBtn").onclick=()=>step(1); $("prevBtn").onclick=()=>step(-1);
+}
+function checkTable(reveal){
+  const v=V[S.cur]; let ok=0,n=0;
+  document.querySelectorAll("#tform input.ans").forEach(inp=>{
+    const pair=v[inp.dataset.t][+inp.dataset.j], fix=inp.nextElementSibling;
+    if(reveal && !inp.value.trim()){ inp.value=S.script==="he"?pair[0]:pair[1]; }
+    const g=grade(inp.value,pair); n++;
+    inp.className="ans "+(g==="ok"||g==="near"?"ok":"no");
+    if(g==="ok"){ok++; fix.hidden=true;}
+    else if(g==="near"){ok++; fix.hidden=false; fix.className="fix warnc"; fix.innerHTML="Standard spelling: "+show(pair);}
+    else {fix.hidden=false; fix.className="fix"; fix.innerHTML=(g==="empty"?"Answer: ":"Correct: ")+show(pair);}
+  });
+  $("tscore").textContent = reveal ? "" : `${ok} / ${n} correct`;
+}
+
+// --- Drill mode ---
+function newDrill(){
+  const av=activeVerbs(), ts=activeTenses(); if(!av.length) return null;
+  const vi=av[Math.floor(Math.random()*av.length)], t=ts[Math.floor(Math.random()*ts.length)], sl=slotsFor(t.k), j=Math.floor(Math.random()*sl.length);
+  return {vi,t,j,done:false};
+}
+function renderDrill(){
+  const el=$("drillView");
+  if(!activeVerbs().length){ el.innerHTML=`<p class="hint">Pick at least one verb above to start.</p>`; return; }
+  if(!S.drill) S.drill=newDrill();
+  const d=S.drill, v=V[d.vi], p=slotsFor(d.t.k)[d.j];
+  el.innerHTML=`
+    <div class="row" style="justify-content:center;gap:10px"><span class="tag">${d.t.en} · <span dir="rtl">${d.t.he}</span></span><span class="tag">${v.b}</span></div>
+    <div><div class="row" style="justify-content:center;gap:10px">${spk(v.inf)}<span style="font-family:var(--f-heb);font-size:1.6rem" dir="rtl">${v.inf}</span></div><div class="prompt-sub">${v.tr} · ${v.en}</div></div>
+    <div><div class="prompt-pron" dir="rtl">${p[0]}</div><div class="prompt-sub">${p[1]}</div></div>
+    <form id="dform" style="width:100%;display:flex;justify-content:center" autocomplete="off"><label for="dans" class="label" hidden>Your answer</label>
+      <input class="ans" id="dans" dir="${S.script==="he"?"rtl":"ltr"}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off" placeholder="${S.script==="he"?"הקלידו כאן":"type here"}"></form>
+    <div class="feedback" id="dfb" aria-live="polite"></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="dcheck" type="button">Check</button><button class="btn ghost" id="dskip" type="button">Skip</button></div>
+    <div class="stats"><span>Score <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span></div>
+    <p class="hint" id="voiceNote" hidden></p>`;
+  voiceNote();
+  const inp=$("dans");
+  const act=()=>{ if(S.drill.done){ S.drill=newDrill(); renderDrill(); $("dans").focus(); return; }
+    const pair=v[d.t.k][d.j], g=grade(inp.value,pair); if(g==="empty"){inp.focus(); return;}
+    d.done=true; S.total++;
+    const sayIt=(d.t.k==="pres"?"":p[0].split(" / ")[0]+" ")+pair[0];
+    if(g!=="no"){S.right++; S.streak++; inp.className="ans ok"; $("dfb").innerHTML=`<span class="ok-t">Correct!</span>${g==="near"?` <span class="hint">Standard spelling: ${show(pair)}</span>`:""}`;}
+    else {S.streak=0; inp.className="ans no"; $("dfb").innerHTML=`<span class="no-t">Not quite.</span> Correct: ${show(pair)}`;}
+    $("dfb").insertAdjacentHTML("beforeend",` <span style="display:inline-block;vertical-align:middle">${spk(sayIt, pair[1])}</span>`); speak([sayIt]);
+    $("dcheck").textContent="Next →"; el.querySelector(".stats").innerHTML=`<span>Score <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span>`; };
+  $("dform").onsubmit=e=>{e.preventDefault(); act();};
+  $("dcheck").onclick=act;
+  $("dskip").onclick=()=>{S.drill=newDrill(); renderDrill(); $("dans").focus();};
+}
+
+// --- On-screen Hebrew keyboard ---
+const KB=[["ק","ר","א","ט","ו","ן","ם","פ"],["ש","ד","ג","כ","ע","י","ח","ל","ך","ף"],["ז","ס","ב","ה","נ","מ","צ","ת","ץ"]];
+let lastInput=null;
+document.addEventListener("focusin",e=>{if(e.target.matches("input.ans")) lastInput=e.target;});
+function renderKb(){
+  const k=$("kb"); k.hidden = S.script!=="he";
+  k.innerHTML = KB.map(r=>`<div class="krow">${r.map(c=>`<button type="button" class="key" data-c="${c}">${c}</button>`).join("")}</div>`).join("")
+   + `<div class="krow"><button type="button" class="key wide" data-c="BK">⌫ Delete</button><button type="button" class="key wide" data-c=" ">Space</button><button type="button" class="key wide" data-c="EN">Enter ↵</button></div>`;
+}
+$("kb").addEventListener("pointerdown",e=>{ if(e.target.closest(".key")) e.preventDefault(); });
+$("kb").addEventListener("click",e=>{
+  const b=e.target.closest(".key"); if(!b) return;
+  const inp = lastInput && document.body.contains(lastInput) ? lastInput : document.querySelector("input.ans"); if(!inp) return;
+  inp.focus(); const c=b.dataset.c;
+  if(c==="EN"){ inp.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true})); if(inp.form && inp.id==="dans") inp.form.requestSubmit(); return; }
+  const s=inp.selectionStart??inp.value.length, en=inp.selectionEnd??s;
+  if(c==="BK"){ if(s===en&&s>0){inp.value=inp.value.slice(0,s-1)+inp.value.slice(en); inp.setSelectionRange(s-1,s-1);} else {inp.value=inp.value.slice(0,s)+inp.value.slice(en); inp.setSelectionRange(s,s);} }
+  else { inp.value=inp.value.slice(0,s)+c+inp.value.slice(en); inp.setSelectionRange(s+1,s+1); }
+  inp.classList.remove("ok","no");
+});
+
+function render(){
+  $("tableView").hidden = S.mode!=="table"; $("drillView").hidden = S.mode!=="drill";
+  S.mode==="table" ? renderTable() : renderDrill(); renderKb();
+}
+S.cur = activeVerbs()[0] ?? 0;
+renderChips(); render();
+</script>
+</body>
+</html>
