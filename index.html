@@ -31,7 +31,7 @@ header p{margin:4px 0 0;color:var(--muted)}
 .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .group{display:flex;flex-direction:column;gap:6px}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
 button{font:inherit;cursor:pointer}
 .chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 12px;display:inline-flex;gap:6px;align-items:center}
 .chip .he{font-family:var(--f-heb);font-size:1.05rem}
@@ -64,7 +64,22 @@ button{font:inherit;cursor:pointer}
 .tag.new{border-color:var(--accent);color:var(--accent);font-weight:700}
 /* Table form */
 .tenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-.tense{border-top:3px solid var(--accent);padding-top:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;border-bottom:3px solid transparent;background:none;color:var(--muted);font-weight:600;padding:8px 14px;margin-bottom:-1px;display:inline-flex;gap:6px;align-items:baseline;white-space:nowrap}
+.tab .he{font-family:var(--f-heb);font-weight:500;font-size:1.05rem}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tabscore{font-size:.8rem;color:var(--good);font-variant-numeric:tabular-nums}
+.btn:disabled{opacity:.45;cursor:default}
+.tertiary{background:none;border:0;border-radius:8px;padding:4px 8px;margin:-4px -8px;color:var(--accent);display:flex;flex-direction:column;align-items:flex-end;text-align:end;gap:0}
+.tertiary .label{color:var(--accent)}
+.tertiary .tert-sub{font-size:.85rem;color:var(--muted)}
+.tertiary:hover{background:var(--accent-soft)}
+.tertiary:hover span[dir=rtl]{text-decoration:underline;text-underline-offset:3px}
+.tertiary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tenses{max-width:560px}
+.tense{padding-top:4px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .tense h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;align-items:baseline}
 .tense h3 > span:last-child{font-family:var(--f-heb);color:var(--muted);font-weight:500}
 .slot{display:grid;grid-template-columns:92px 1fr auto;gap:8px;align-items:start}
@@ -114,6 +129,10 @@ details.panel summary{cursor:pointer;font-weight:700;list-style-position:outside
 .key.wide{max-width:140px;flex:3 1 0;font-family:var(--f-body);font-size:.9rem}
 .key:active{background:var(--accent-soft)}
 .hint{font-size:.85rem;color:var(--muted);margin:0}
+.acct{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.acct label{gap:2px}
+.acct-in{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:200px;max-width:100%}
+.acct-in:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:480px){.slot{grid-template-columns:78px 1fr auto}.verbhead .inf{font-size:1.8rem}}
 /* Phones and tablets already have a keyboard: hide the on-screen one there */
 @media (pointer:coarse){.kb{display:none!important}.wrap{padding-block-end:40px}}
@@ -125,32 +144,30 @@ details.panel summary{cursor:pointer;font-weight:700;list-style-position:outside
 <div class="wrap">
   <header>
     <h1>Hebrew Verb Drills <span lang="he" dir="rtl">תרגול פעלים</span></h1>
-    <p>Learn the 50 most common Hebrew verbs, starting with the most frequent. You practice a few at a time, and a new verb joins as soon as you've learned one.</p>
+    <p>Learn the 50 most common Hebrew verbs, starting with the most frequent. You practice one verb at a time, and the next one starts as soon as you've learned it.</p>
   </header>
+
+  <section class="panel" id="account" aria-label="Your account" hidden></section>
 
   <section class="panel" id="progress" aria-label="Your progress"></section>
 
-  <section class="panel" aria-label="Settings">
-    <div class="controls">
+  <div class="controls">
+    <section class="panel" aria-label="Mode">
       <div class="group"><span class="label">Mode</span>
         <div class="seg" id="modeSeg"><button type="button" data-v="drill" aria-pressed="true">Quick drill</button><button type="button" data-v="table" aria-pressed="false">Full table</button></div></div>
-      <div class="group"><span class="label">Tenses</span>
-        <div class="row" id="tenseChips"></div></div>
+    </section>
+    <section class="panel" aria-label="Answer in">
       <div class="group"><span class="label">Answer in</span>
         <div class="seg" id="scriptSeg"><button type="button" data-v="he" aria-pressed="true">עברית</button><button type="button" data-v="tr" aria-pressed="false">Transliteration</button></div></div>
-      <div class="group"><span class="label">Verbs at a time</span>
-        <div class="seg" id="batchSeg"><button type="button" data-v="3">3</button><button type="button" data-v="5">5</button><button type="button" data-v="8">8</button></div></div>
-      <div class="group"><span class="label">Read-aloud speed</span>
-        <div class="seg" id="rateSeg"><button type="button" data-v="0.9">Normal</button><button type="button" data-v="0.6">Slow</button></div></div>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <section class="panel drill" id="drillView" aria-label="Quick drill"></section>
   <section class="panel" id="tableView" aria-label="Conjugation table" hidden></section>
 
   <details class="panel" id="allList">
     <summary>All 50 verbs, most common first</summary>
-    <p class="hint">The order is an approximate everyday-frequency ranking. Click any verb to open its full table.</p>
+    <p class="hint">The order is an approximate everyday-frequency ranking. Click any verb to work on it now, in whichever mode you're using.</p>
     <ul class="vlist" id="vlist"></ul>
     <div class="row" id="resetRow"><button class="btn ghost" id="resetBtn" type="button">Reset my progress</button></div>
   </details>
@@ -158,7 +175,23 @@ details.panel summary{cursor:pointer;font-weight:700;list-style-position:outside
 
 <div class="kb" id="kb" aria-label="Hebrew keyboard"></div>
 
+<!-- Online accounts (Firebase). These load only on a normal website such as GitHub Pages. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+// ===== PASTE YOUR FIREBASE CONFIG HERE =====
+// Replace null with the firebaseConfig object from Firebase (Project settings → Your apps), e.g.
+// const FIREBASE_CONFIG = { apiKey: "...", authDomain: "...", projectId: "...", storageBucket: "...", messagingSenderId: "...", appId: "..." };
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAdLkQ12qKj9cpxDXoM7DjELsEx67w-Pv8",
+  authDomain: "hebrew-verbs-610d3.firebaseapp.com",
+  projectId: "hebrew-verbs-610d3",
+  storageBucket: "hebrew-verbs-610d3.firebasestorage.app",
+  messagingSenderId: "592974600666",
+  appId: "1:592974600666:web:237ca9a3c93786b7b008e3"
+};
+// ===========================================
 // Verbs in approximate frequency order. Each form is "Hebrew translit".
 // present: m.sg, f.sg, m.pl, f.pl · past & future: I, you m.sg, you f.sg, he, she, we, you m.pl, you f.pl, they
 const RAW = [
@@ -373,12 +406,93 @@ const LEARNED_AT = 3;   // a form counts as learned after 3 correct answers in a
 const REVIEW_SHARE = 0.15; // share of drill questions that revisit learned verbs
 
 // --- State & storage (kept in this browser only) ---
-const S = {tenses:new Set(["past","pres","fut"]), script:"he", mode:"drill", rate:"0.9", batch:5, cur:null, drill:null, right:0, total:0, streak:0, flash:"", last:""};
+const S = {tenses:new Set(["past","pres","fut"]), script:"he", mode:"drill", rate:"0.9", batch:1, tab:"past", cur:null, drill:null, right:0, total:0, streak:0, flash:"", last:""};
 let PR = {};
-try{const s=JSON.parse(localStorage.getItem("hvd")||"null"); if(s){ if(s.tenses?.length) S.tenses=new Set(s.tenses); if(s.script) S.script=s.script; if(s.mode) S.mode=s.mode; if(s.rate) S.rate=s.rate; if(s.batch) S.batch=+s.batch; }}catch(e){}
+try{const s=JSON.parse(localStorage.getItem("hvd")||"null"); if(s){ if(s.script) S.script=s.script; if(s.mode) S.mode=s.mode; }}catch(e){}
 try{PR=JSON.parse(localStorage.getItem("hvd-progress")||"{}")||{};}catch(e){PR={};}
-const save=()=>{try{localStorage.setItem("hvd",JSON.stringify({tenses:[...S.tenses],script:S.script,mode:S.mode,rate:S.rate,batch:S.batch}))}catch(e){}};
-const saveProgress=()=>{try{localStorage.setItem("hvd-progress",JSON.stringify(PR))}catch(e){}};
+const save=()=>{try{localStorage.setItem("hvd",JSON.stringify({script:S.script,mode:S.mode}))}catch(e){} scheduleCloud();};
+// --- Online accounts: username + password, progress stored per user in Firestore ---
+const NAME_DOMAIN = "users.hebrew-verb-drills.app"; // usernames become name@this-domain behind the scenes
+let fb=null, uid=null, saveTimer=null;
+const localKey = () => uid ? "hvd-progress-"+uid : "hvd-progress";
+const saveProgress=()=>{ try{localStorage.setItem(localKey(),JSON.stringify(PR))}catch(e){} scheduleCloud(); };
+function scheduleCloud(){ if(!fb||!uid) return; clearTimeout(saveTimer); saveTimer=setTimeout(()=>{saveTimer=null; pushCloud();},1500); }
+async function pushCloud(){
+  if(!fb||!uid) return; S.cloud="saving"; renderAccountStatus();
+  try{ await fb.db.collection("progress").doc(uid).set({pr:PR, script:S.script, updatedAt:firebase.firestore.FieldValue.serverTimestamp()}); S.cloud="saved"; }
+  catch(e){ S.cloud = e.code==="permission-denied" ? "denied" : "error"; }
+  renderAccountStatus();
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"&&saveTimer){ clearTimeout(saveTimer); saveTimer=null; pushCloud(); }});
+function initCloud(){
+  if(!FIREBASE_CONFIG || !window.firebase) return;
+  try{ firebase.initializeApp(FIREBASE_CONFIG); fb={auth:firebase.auth(), db:firebase.firestore()}; }catch(e){ fb=null; return; }
+  fb.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+  $("account").hidden=false; S.cloud="checking"; renderAccount();
+  fb.auth.onAuthStateChanged(onAuth);
+}
+async function onAuth(user){
+  uid = user ? user.uid : null;
+  S.userName = user ? (user.displayName || (user.email||"").split("@")[0] || "you") : "";
+  if(user){
+    S.cloud="loading"; renderAccount();
+    try{
+      const snap = await fb.db.collection("progress").doc(uid).get();
+      if(snap.exists && snap.data().pr){ const d=snap.data(); PR=d.pr; if(d.script) S.script=d.script; S.cloud="saved"; }
+      else { await pushCloud(); } // new account: keep whatever was practiced on this device
+      try{localStorage.setItem(localKey(),JSON.stringify(PR))}catch(e){}
+    }catch(e){
+      S.cloud = e.code==="permission-denied" ? "denied" : "error";
+      try{PR=JSON.parse(localStorage.getItem(localKey())||"{}")||{};}catch(_){PR={};}
+    }
+  } else {
+    S.cloud=""; try{PR=JSON.parse(localStorage.getItem("hvd-progress")||"{}")||{};}catch(e){PR={};}
+  }
+  S.drill=null; S.cur=null; S.right=S.total=S.streak=0;
+  renderAccount(); renderAll();
+}
+const AUTH_ERR = {
+  "auth/invalid-credential":"Username or password is incorrect.", "auth/wrong-password":"Username or password is incorrect.",
+  "auth/user-not-found":"No account with that username. Check the spelling or create an account.", "auth/invalid-login-credentials":"Username or password is incorrect.",
+  "auth/email-already-in-use":"That username is taken. Sign in instead, or pick another name.", "auth/weak-password":"Use a password with at least 6 characters.",
+  "auth/too-many-requests":"Too many tries. Wait a few minutes and try again.", "auth/network-request-failed":"No internet connection. Check your connection and try again.",
+  "auth/operation-not-allowed":"Google sign-in isn't switched on yet. In Firebase, open Authentication → Sign-in method and enable Google.",
+  "auth/unauthorized-domain":"This website isn't allowed yet. In Firebase, open Authentication → Settings → Authorized domains and add it."
+};
+function renderAccountStatus(){
+  const el=$("cloudStatus"); if(!el) return;
+  el.className="hint"; el.style.color="";
+  if(S.cloud==="saving") el.textContent="Saving…";
+  else if(S.cloud==="saved") el.textContent="Progress saved to your account";
+  else if(S.cloud==="denied"){ el.textContent="Couldn't save: Firestore rules are blocking it. Check the rules step in the setup."; el.style.color="var(--bad)"; }
+  else if(S.cloud==="error"){ el.textContent="Couldn't reach the server. Progress is kept on this device and will save when you're back online."; el.style.color="var(--warn)"; }
+  else el.textContent="";
+}
+function renderAccount(){
+  const el=$("account"); if(!fb) return;
+  if(S.cloud==="checking"||S.cloud==="loading"){ el.innerHTML=`<p class="hint">${S.cloud==="loading"?"Loading your progress…":"Checking sign-in…"}</p>`; return; }
+  if(uid){
+    el.innerHTML=`<div class="row" style="justify-content:space-between"><div><span class="label">Signed in</span><div style="font-weight:700;font-size:1.1rem">${esc(S.userName)}</div><p class="hint" id="cloudStatus" role="status"></p></div>
+      <button class="btn ghost" id="signOut" type="button">Sign out</button></div>`;
+    $("signOut").onclick=()=>{ if(saveTimer){clearTimeout(saveTimer); saveTimer=null; pushCloud().finally(()=>fb.auth.signOut());} else fb.auth.signOut(); };
+    renderAccountStatus(); return;
+  }
+  el.innerHTML=`<div class="group"><span class="label">Save your progress</span>
+    <p class="hint">Sign in to keep your progress on any device. Without signing in, it's saved on this device only.</p></div>
+    <div class="row"><button class="btn" type="button" id="googleBtn">Sign in with Google</button></div>
+    <p class="hint" id="authMsg" role="alert"></p>`;
+  $("googleBtn").onclick=async()=>{
+    const msg=$("authMsg"), provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:"select_account"});
+    msg.style.color=""; msg.textContent="Opening Google sign-in…";
+    try{ await fb.auth.signInWithPopup(provider); }
+    catch(e){
+      if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){ msg.textContent="Redirecting to Google…"; return fb.auth.signInWithRedirect(provider); }
+      if(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request"){ msg.textContent=""; return; }
+      msg.textContent=AUTH_ERR[e.code]||("Something went wrong: "+(e.message||e.code)); msg.style.color="var(--bad)";
+    }
+  };
+}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -389,13 +503,33 @@ const formsOf = vi => activeTenses().filter(t=>V[vi][t.k]).flatMap(t=>V[vi][t.k]
 const mastery = vi => { const f=formsOf(vi); return f.length ? f.reduce((a,x)=>a+Math.min(box(vi,x.k,x.j),LEARNED_AT),0)/(f.length*LEARNED_AT) : 1; };
 const isLearned = vi => formsOf(vi).every(x=>box(vi,x.k,x.j)>=LEARNED_AT);
 const isNew = vi => formsOf(vi).every(x=>!(PR[V[vi].inf]||{})[x.k+x.j] && (PR[V[vi].inf]||{})[x.k+x.j]!==0);
-function rotation(){ const r=[]; for(let i=0;i<V.length&&r.length<S.batch;i++) if(!isLearned(i)) r.push(i); return r; }
-function nextUp(){ const r=rotation(); for(let i=(r.length?r[r.length-1]+1:V.length);i<V.length;i++) if(!isLearned(i)) return i; return null; }
+// The current verb is the first unlearned verb at or after the saved position (wrapping around),
+// so skipped verbs come back after the end of the list.
+const focusPos = () => Math.min(Math.max(+PR["#focus"]||0,0),V.length-1);
+function findUnlearned(from,dir){ for(let s=0;s<V.length;s++){ const i=(from+dir*s+V.length*2)%V.length; if(!isLearned(i)) return i; } return null; }
+function rotation(){ if(PR["#pinned"]) return [focusPos()]; const i=findUnlearned(focusPos(),1); return i==null?[]:[i]; }
+// Pick any verb from the list to work on (even one already learned)
+function chooseVerb(i){
+  PR["#focus"]=i; PR["#pinned"]=1; saveProgress();
+  S.drill=null; S.last=""; S.cur=i;
+  S.flash=`Now working on <span class="he" dir="rtl">${V[i].inf}</span> (${esc(V[i].en)}).`;
+  renderAll();
+  $("progress").scrollIntoView({behavior:"smooth",block:"start"});
+  setTimeout(()=>(S.mode==="drill"?$("dans"):$("panel-"+S.tab)?.querySelector("input.ans"))?.focus({preventScroll:true}),300);
+}
+function nextUp(){ const r=rotation(); if(!r.length) return null; const i=findUnlearned(r[0]+1,1); return i===r[0]?null:i; }
+function moveVerb(dir){
+  const r=rotation(); if(!r.length) return;
+  const i=findUnlearned(r[0]+dir,dir); if(i==null||i===r[0]) return;
+  PR["#focus"]=i; delete PR["#pinned"]; saveProgress();
+  S.drill=null; S.last=""; S.flash=""; S.cur=i;
+  renderAll(); $("dans")?.focus();
+}
 function record(vi,k,j,correct){
   const wasLearned=isLearned(vi), o=PR[V[vi].inf]||(PR[V[vi].inf]={}), b=o[k+j]||0;
   o[k+j] = correct ? b+1 : Math.max(0,b-2);
   saveProgress();
-  if(!wasLearned && isLearned(vi)){ const n=nextUp(); S.flash=`You learned <span class="he" dir="rtl">${V[vi].inf}</span> (${esc(V[vi].en)})!`+(n!=null?` Next up: <span class="he" dir="rtl">${V[n].inf}</span>.`:""); }
+  if(!wasLearned && isLearned(vi)){ if(PR["#pinned"]&&focusPos()===vi){ delete PR["#pinned"]; saveProgress(); } const n=nextUp(); S.flash=`You learned <span class="he" dir="rtl">${V[vi].inf}</span> (${esc(V[vi].en)})!`+(n!=null?` Next up: <span class="he" dir="rtl">${V[n].inf}</span>.`:""); }
 }
 const pct = vi => Math.round(mastery(vi)*100);
 const barHtml = (vi,cls="") => `<span class="bar ${cls}" aria-hidden="true"><i style="width:${pct(vi)}%"></i></span>`;
@@ -419,12 +553,23 @@ const canSpeak='speechSynthesis' in window;
 const heVoice=()=>canSpeak?speechSynthesis.getVoices().find(v=>/^(he|iw)/i.test(v.lang)):null;
 if(canSpeak) speechSynthesis.onvoiceschanged=()=>voiceNote();
 function voiceNote(){const n=$("voiceNote"); if(!n) return; n.hidden=canSpeak&&!!heVoice(); n.textContent=canSpeak?"No Hebrew voice found on this device, so read-aloud may sound wrong. Add a Hebrew voice in your system's speech or language settings.":"This browser can't read text aloud.";}
+let liveUtterances=[]; // keep references so the browser doesn't drop them mid-speech
+function speakFailed(){const n=$("voiceNote"); if(!n) return; n.hidden=false;
+  n.textContent="No sound? Check that your volume is up and, on iPhone, that the silent switch is off. Some in-app previews block speech, so open the page in Chrome, Safari or Edge. If it still doesn't work, add a Hebrew voice in your system's speech settings.";}
 function speak(list,btn){
   if(!canSpeak) return voiceNote();
-  speechSynthesis.cancel(); document.querySelectorAll(".playing").forEach(b=>b.classList.remove("playing"));
+  const busy=speechSynthesis.speaking||speechSynthesis.pending;
+  if(busy) speechSynthesis.cancel();
+  document.querySelectorAll(".playing").forEach(b=>b.classList.remove("playing"));
   const voice=heVoice(); if(btn) btn.classList.add("playing");
-  list.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t); u.lang="he-IL"; if(voice) u.voice=voice; u.rate=+S.rate;
-    if(i===list.length-1) u.onend=u.onerror=()=>btn&&btn.classList.remove("playing"); speechSynthesis.speak(u);});
+  let started=false;
+  liveUtterances=list.map((t,i)=>{const u=new SpeechSynthesisUtterance(t); u.lang="he-IL"; if(voice) u.voice=voice; u.rate=+S.rate; u.volume=1;
+    u.onstart=()=>{started=true;};
+    if(i===list.length-1) u.onend=u.onerror=()=>btn&&btn.classList.remove("playing");
+    return u;});
+  const go=()=>{ speechSynthesis.resume(); liveUtterances.forEach(u=>speechSynthesis.speak(u)); };
+  busy ? setTimeout(go,80) : go(); // Chrome and Safari can swallow speech queued right after cancel()
+  setTimeout(()=>{ if(!started){ btn&&btn.classList.remove("playing"); speakFailed(); } },2500);
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest(".spk"); if(b){speak([b.dataset.say],b); return;}
@@ -438,24 +583,22 @@ function renderProgress(){
   $("progress").innerHTML = `
     <div class="prog-top">
       <div><span class="label">Learned</span><div class="bignum">${learned} <small>of ${V.length} verbs</small></div></div>
-      ${n!=null?`<div style="text-align:end"><span class="label">Next up</span><div><span style="font-family:var(--f-heb);font-size:1.2rem" dir="rtl">${V[n].inf}</span> <span class="hint" style="display:inline">${esc(V[n].en)}</span></div></div>`:""}
+      ${n!=null?`<button class="tertiary" id="goNext" type="button" aria-label="Next up: ${esc(V[n].en)}. Switch to this verb now"><span class="label">Next up →</span><span><span style="font-family:var(--f-heb);font-size:1.2rem" dir="rtl">${V[n].inf}</span> <span class="tert-sub">${esc(V[n].en)}</span></span></button>`:""}
     </div>
     <span class="bar wide" aria-hidden="true"><i style="width:${Math.round(learned/V.length*100)}%"></i></span>
     ${S.flash?`<div class="flash" role="status">${S.flash}</div>`:""}
-    <div class="group"><span class="label">Learning now</span>
-      <div class="row">${rot.length?rot.map(i=>`<button type="button" class="chip" data-open="${i}" aria-pressed="${S.mode==="table"&&S.cur===i}" title="Open full table"><span class="he" dir="rtl">${V[i].inf}</span><small>${esc(V[i].en)}</small>${barHtml(i)}<span class="pct">${pct(i)}%</span></button>`).join(""):`<span class="hint">You've learned all ${V.length} verbs. The drill now reviews them.</span>`}</div>
-    </div>`;
+    ${rot.length?"":`<p class="hint">You've learned all ${V.length} verbs. The drill now reviews them.</p>`}`;
 }
-$("progress").addEventListener("click",e=>{const b=e.target.closest("[data-open]"); if(b) openVerb(+b.dataset.open);});
+$("progress").addEventListener("click",e=>{ if(e.target.closest("#goNext")){ moveVerb(1); return; }const b=e.target.closest("[data-open]"); if(b) openVerb(+b.dataset.open);});
 
 function renderList(){
   const rot=rotation();
   $("vlist").innerHTML = V.map((v,i)=>{
-    const st = isLearned(i) ? `<span class="st done">Learned</span>` : rot.includes(i) ? `<span class="st now">${pct(i)}%</span>` : `<span class="st wait">${pct(i)?pct(i)+"%":"Not started"}</span>`;
+    const st = rot.includes(i) ? `<span class="st now">Working on · ${pct(i)}%</span>` : isLearned(i) ? `<span class="st done">Learned</span>` : `<span class="st wait">${pct(i)?pct(i)+"%":"Not started"}</span>`;
     return `<li><span class="n">${i+1}</span><button type="button" data-open="${i}"><span class="he" dir="rtl">${v.inf}</span><small>${esc(v.en)}</small></button>${st}</li>`;
   }).join("");
 }
-$("vlist").addEventListener("click",e=>{const b=e.target.closest("[data-open]"); if(b){openVerb(+b.dataset.open); $("tableView").scrollIntoView({behavior:"smooth",block:"start"});}});
+$("vlist").addEventListener("click",e=>{const b=e.target.closest("[data-open]"); if(b) chooseVerb(+b.dataset.open);});
 function openVerb(i){ S.cur=i; S.mode="table"; S.flash=""; save(); renderAll(); }
 
 // Reset with an inline confirmation
@@ -468,29 +611,29 @@ $("resetRow").addEventListener("click",e=>{
 
 // --- Settings ---
 function renderSettings(){
-  $("tenseChips").innerHTML = TENSES.map(t=>`<button type="button" class="chip" data-k="${t.k}" aria-pressed="${S.tenses.has(t.k)}">${t.en} <span class="he" dir="rtl">${t.he}</span></button>`).join("");
-  for(const [seg,key] of [["scriptSeg","script"],["modeSeg","mode"],["rateSeg","rate"],["batchSeg","batch"]]) $(seg).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===String(S[key]))));
+  for(const [seg,key] of [["scriptSeg","script"],["modeSeg","mode"]]) $(seg).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===String(S[key]))));
 }
-$("tenseChips").onclick=e=>{const b=e.target.closest(".chip"); if(!b) return; const k=b.dataset.k; if(S.tenses.has(k)&&S.tenses.size===1) return; S.tenses.has(k)?S.tenses.delete(k):S.tenses.add(k); S.drill=null; save(); renderAll();};
 $("scriptSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.script=b.dataset.v; save(); renderAll();}};
 $("modeSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.mode=b.dataset.v; S.flash=""; save(); renderAll();}};
-$("batchSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.batch=+b.dataset.v; S.drill=null; save(); renderAll();}};
-$("rateSeg").onclick=e=>{const b=e.target.closest("button"); if(b){S.rate=b.dataset.v; save(); renderSettings();}};
 
 // --- Table mode ---
 function renderTable(){
   const el=$("tableView"), rot=rotation();
   if(S.cur==null) S.cur = rot.length ? rot.reduce((a,b)=>mastery(b)<mastery(a)?b:a) : 0;
   const v=V[S.cur], dir=S.script==="he"?"rtl":"ltr";
-  const ts=activeTenses().filter(t=>v[t.k]);
+  const ts=TENSES.filter(t=>v[t.k]);
+  if(!TENSES.some(t=>t.k===S.tab)) S.tab="past";
   el.innerHTML = `
     <div class="verbhead">
       <div class="row" style="gap:14px;align-items:center">${spk(v.inf)}<span class="inf" dir="rtl">${v.inf}</span><span class="meta">${v.tr} · ${esc(v.en)}</span></div>
       <div class="row"><span class="tag">#${S.cur+1} most common</span><span class="tag">root <span dir="rtl">${v.root}</span></span><span class="tag">${v.b}</span>${isLearned(S.cur)?`<span class="tag" style="color:var(--good);border-color:var(--good)">Learned</span>`:`${barHtml(S.cur)}<span class="pct">${pct(S.cur)}%</span>`}</div>
     </div>
-    ${!v.pres&&S.tenses.has("pres")?`<p class="hint">${v.inf} has no present tense in modern Hebrew. Hebrew just leaves the verb out ("אני בבית" = I am at home).</p>`:""}
+    <div class="tabs" role="tablist" aria-label="Tense">
+      ${TENSES.map(t=>`<button type="button" class="tab" role="tab" id="tab-${t.k}" data-tab="${t.k}" aria-controls="panel-${t.k}" aria-selected="${t.k===S.tab}" tabindex="${t.k===S.tab?0:-1}">${t.en} <span class="he" dir="rtl">${t.he}</span><span class="tabscore" id="ts-${t.k}"></span></button>`).join("")}
+    </div>
     <form id="tform" class="tenses" autocomplete="off">
-      ${ts.map(t=>`<div class="tense"><h3><span style="display:inline-flex;gap:10px;align-items:baseline">${t.en}<button type="button" class="readall" data-t="${t.k}" aria-label="Read all ${t.en} forms aloud">${ICON}Read all</button></span><span dir="rtl">${t.he}</span></h3>
+      ${!v.pres?`<div class="tense" role="tabpanel" id="panel-pres" aria-labelledby="tab-pres" data-k="pres" ${S.tab==="pres"?"":"hidden"}><p class="hint">${v.inf} has no present tense in modern Hebrew. Hebrew just leaves the verb out ("אני בבית" = I am at home).</p></div>`:""}
+      ${ts.map(t=>`<div class="tense" role="tabpanel" id="panel-${t.k}" aria-labelledby="tab-${t.k}" data-k="${t.k}" ${t.k===S.tab?"":"hidden"}><h3><span style="display:inline-flex;gap:10px;align-items:baseline">${t.en}<button type="button" class="readall" data-t="${t.k}" aria-label="Read all ${t.en} forms aloud">${ICON}Read all</button></span><span dir="rtl">${t.he}</span></h3>
         ${slotsFor(t.k).map((p,j)=>`<div class="slot"><label class="pron" for="a-${t.k}-${j}"><span class="he" dir="rtl">${p[0]}</span><small>${p[1]}</small></label>
           <div class="field"><input class="ans" id="a-${t.k}-${j}" data-t="${t.k}" data-j="${j}" dir="${dir}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off"><div class="fix" hidden></div></div>${spk(v[t.k][j][0], v[t.k][j][1])}</div>`).join("")}
       </div>`).join("")}
@@ -499,24 +642,37 @@ function renderTable(){
       <div class="row"><button class="btn" id="checkBtn" type="button">Check answers</button><button class="btn ghost" id="revealBtn" type="button">Show answers</button><button class="btn ghost" id="clearBtn" type="button">Clear</button></div>
       <div class="row"><span class="score" id="tscore"></span><button class="btn ghost" id="prevBtn" type="button" aria-label="Previous verb">←</button><button class="btn" id="nextBtn" type="button">Next verb →</button></div>
     </div>
-    <p class="hint">Checking counts toward your progress. Next verb moves through the verbs you're learning now. Missing ו or י is accepted and flagged in amber. Speaker buttons read the correct form, so try answering first.</p>
+    <p class="hint">Checking counts toward your progress and checks only the open tab; your answers stay when you switch tabs. The arrows browse all 50 verbs in order of frequency. Missing ו or י is accepted and flagged in amber. Speaker buttons read the correct form, so try answering first.</p>
     <p class="hint" id="voiceNote" hidden></p>`;
   voiceNote();
-  let counted=false;
-  const inputs=[...el.querySelectorAll("input.ans")];
-  inputs.forEach((inp,i)=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault(); (inputs[i+1]||$("checkBtn")).focus();}}));
+  const counted={}, scores={};
+  const panel=()=>$("panel-"+S.tab);
+  const panelInputs=()=>[...(panel()?.querySelectorAll("input.ans")||[])];
+  const syncButtons=()=>{ const has=panelInputs().length>0; ["checkBtn","revealBtn","clearBtn"].forEach(id=>$(id).disabled=!has); $("tscore").textContent=scores[S.tab]||""; };
+  el.querySelectorAll(".tense").forEach(p=>{ const ins=[...p.querySelectorAll("input.ans")];
+    ins.forEach((inp,i)=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault(); (ins[i+1]||$("checkBtn")).focus();}})); });
+  const selectTab=(k,focus)=>{ S.tab=k;
+    el.querySelectorAll(".tab").forEach(b=>{const on=b.dataset.tab===k; b.setAttribute("aria-selected",on); b.tabIndex=on?0:-1; if(on&&focus) b.focus();});
+    el.querySelectorAll(".tense").forEach(p=>p.hidden=p.dataset.k!==k); syncButtons(); };
+  const tablist=el.querySelector(".tabs");
+  tablist.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) selectTab(b.dataset.tab);});
+  tablist.addEventListener("keydown",e=>{ const i=TENSES.findIndex(t=>t.k===S.tab);
+    if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault(); selectTab(TENSES[(i+(e.key==="ArrowRight"?1:-1)+3)%3].k,true);} });
   $("tform").onsubmit=e=>e.preventDefault();
-  const check=reveal=>{ const res=checkTable(reveal,!counted); counted=true; renderProgress(); renderList(); return res; };
+  const check=reveal=>{ const k=S.tab, res=checkTable(reveal,!counted[k],panelInputs()); counted[k]=true;
+    scores[k]=res; $("tscore").textContent=res||""; $("ts-"+k).textContent=res?" · "+res.replace(" correct",""):"";
+    renderProgress(); renderList(); };
   $("checkBtn").onclick=()=>check(false);
   $("revealBtn").onclick=()=>check(true);
-  $("clearBtn").onclick=()=>{counted=false; inputs.forEach(i=>{i.value="";i.className="ans";i.nextElementSibling.hidden=true;}); $("tscore").textContent=""; inputs[0]?.focus();};
-  const step=d=>{ const r=rotation(); const list=r.includes(S.cur)?r:[...r,S.cur].sort((a,b)=>a-b); const k=list.indexOf(S.cur);
-    S.cur=list[(k+d+list.length)%list.length]; S.flash=""; renderAll(); el.querySelector("input.ans")?.focus(); };
+  $("clearBtn").onclick=()=>{ const k=S.tab; counted[k]=false; scores[k]=""; $("ts-"+k).textContent="";
+    panelInputs().forEach(i=>{i.value="";i.className="ans";i.nextElementSibling.hidden=true;}); syncButtons(); panelInputs()[0]?.focus();};
+  syncButtons();
+  const step=d=>{ S.cur=(S.cur+d+V.length)%V.length; S.flash=""; renderAll(); $("panel-"+S.tab)?.querySelector("input.ans")?.focus(); };
   $("nextBtn").onclick=()=>step(1); $("prevBtn").onclick=()=>step(-1);
 }
-function checkTable(reveal,count){
+function checkTable(reveal,count,inputs){
   const vi=S.cur, v=V[vi]; let ok=0,n=0;
-  document.querySelectorAll("#tform input.ans").forEach(inp=>{
+  inputs.forEach(inp=>{
     const k=inp.dataset.t, j=+inp.dataset.j, pair=v[k][j], fix=inp.nextElementSibling;
     let g=grade(inp.value,pair);
     if(count && g!=="empty") record(vi,k,j,g!=="no");
@@ -529,7 +685,7 @@ function checkTable(reveal,count){
     else if(g==="shown"){fix.hidden=true;}
     else {fix.hidden=false; fix.className="fix"; fix.innerHTML=(g==="empty"?"Answer: ":"Correct: ")+show(pair);}
   });
-  $("tscore").textContent = reveal ? "" : `${ok} / ${n} correct`;
+  return reveal ? "" : `${ok} / ${n} correct`;
 }
 
 // --- Drill mode: weak forms of the current verbs come up most; learned verbs come back now and then ---
@@ -559,8 +715,7 @@ function renderDrill(){
     <form id="dform" style="width:100%;display:flex;justify-content:center" autocomplete="off">
       <input class="ans" id="dans" aria-label="Your answer" dir="${S.script==="he"?"rtl":"ltr"}" lang="${S.script==="he"?"he":"en"}" spellcheck="false" autocapitalize="off" placeholder="${S.script==="he"?"הקלידו כאן":"type here"}"></form>
     <div class="feedback" id="dfb" aria-live="polite"></div>
-    <div class="row" style="justify-content:center"><button class="btn" id="dcheck" type="button">Check</button><button class="btn ghost" id="dskip" type="button">Skip</button><button class="btn ghost" id="dtable" type="button">See full table</button></div>
-    <div class="stats"><span>This session <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="dcheck" type="button">Check</button><button class="btn ghost" id="dskip" type="button">Skip question</button><button class="btn ghost" id="dtable" type="button">See full table</button></div>    <div class="stats"><span>This session <b>${S.right} / ${S.total}</b></span><span>Streak <b>${S.streak}</b></span></div>
     <p class="hint" id="voiceNote" hidden></p>`;
   voiceNote();
   const inp=$("dans");
@@ -579,8 +734,7 @@ function renderDrill(){
   };
   $("dform").onsubmit=e=>{e.preventDefault(); act();};
   $("dcheck").onclick=act;
-  $("dskip").onclick=()=>{S.drill=newDrill(); renderDrill(); $("dans").focus();};
-  $("dtable").onclick=()=>openVerb(d.vi);
+  $("dskip").onclick=()=>{S.drill=newDrill(); renderDrill(); $("dans").focus();};  $("dtable").onclick=()=>openVerb(d.vi);
 }
 
 // --- On-screen Hebrew keyboard (desktop only) ---
@@ -612,6 +766,7 @@ function renderAll(){
   renderKb();
 }
 renderAll();
+initCloud();
 </script>
 </body>
 </html>
