@@ -27,6 +27,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 header h1{font-family:var(--f-heb);font-size:2rem;margin:0;text-wrap:balance;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
 header h1 span[lang=he]{color:var(--accent)}
 header p{margin:4px 0 0;color:var(--muted)}
+.titlebar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.titlebar h1{min-width:0}
+#account{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:end;max-width:100%}
+#account .who{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+#account .who b{font-weight:700}
+#account .btn{padding:6px 14px}
+#account .hint{font-size:.78rem}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
 .label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -143,11 +150,12 @@ details.panel summary{cursor:pointer;font-weight:700;list-style-position:outside
 
 <div class="wrap">
   <header>
-    <h1>Hebrew Verb Drills <span lang="he" dir="rtl">תרגול פעלים</span></h1>
+    <div class="titlebar">
+      <h1>Hebrew Verb Drills <span lang="he" dir="rtl">תרגול פעלים</span></h1>
+      <div id="account" aria-label="Your account" hidden></div>
+    </div>
     <p>Learn the 50 most common Hebrew verbs, starting with the most frequent. You practice one verb at a time, and the next one starts as soon as you've learned it.</p>
   </header>
-
-  <section class="panel" id="account" aria-label="Your account" hidden></section>
 
   <section class="panel" id="progress" aria-label="Your progress"></section>
 
@@ -472,14 +480,12 @@ function renderAccount(){
   const el=$("account"); if(!fb) return;
   if(S.cloud==="checking"||S.cloud==="loading"){ el.innerHTML=`<p class="hint">${S.cloud==="loading"?"Loading your progress…":"Checking sign-in…"}</p>`; return; }
   if(uid){
-    el.innerHTML=`<div class="row" style="justify-content:space-between"><div><span class="label">Signed in</span><div style="font-weight:700;font-size:1.1rem">${esc(S.userName)}</div><p class="hint" id="cloudStatus" role="status"></p></div>
-      <button class="btn ghost" id="signOut" type="button">Sign out</button></div>`;
+    el.innerHTML=`<div class="who"><span class="hint" style="font-size:.9rem">Signed in as <b style="color:var(--ink)">${esc(S.userName)}</b></span><button class="btn ghost" id="signOut" type="button">Sign out</button></div>
+      <p class="hint" id="cloudStatus" role="status"></p>`;
     $("signOut").onclick=()=>{ if(saveTimer){clearTimeout(saveTimer); saveTimer=null; pushCloud().finally(()=>fb.auth.signOut());} else fb.auth.signOut(); };
     renderAccountStatus(); return;
   }
-  el.innerHTML=`<div class="group"><span class="label">Save your progress</span>
-    <p class="hint">Sign in to keep your progress on any device. Without signing in, it's saved on this device only.</p></div>
-    <div class="row"><button class="btn" type="button" id="googleBtn">Sign in with Google</button></div>
+  el.innerHTML=`<button class="btn" type="button" id="googleBtn">Sign in with Google</button>
     <p class="hint" id="authMsg" role="alert"></p>`;
   $("googleBtn").onclick=async()=>{
     const msg=$("authMsg"), provider=new firebase.auth.GoogleAuthProvider();
